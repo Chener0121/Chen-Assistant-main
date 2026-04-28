@@ -1,7 +1,7 @@
 from langchain.chat_models import init_chat_model
 from langchain_openai import OpenAIEmbeddings
 
-from src.config import settings
+from src.core.config import settings
 
 llm = init_chat_model(
     model="qwen-flash",

@@ -20,6 +20,10 @@ backend/
 │   ├── utils/                  # 通用工具函数
 │   │   └── helpers.py
 │   │
+│   ├── core/                   # 核心基础设施（数据库连接、LLM客户端、配置等）
+│   │   ├── config.py
+│   │   └── llm_client.py       # llm / embeddings 初始化
+│   │
 │   ├── api/                    # [表现层] 处理HTTP请求与响应
 │   │   └── v1/                 # API版本管理
 │   │       ├── endpoints/      # 按业务模块拆分的路由
@@ -29,7 +33,9 @@ backend/
 │   │
 │   ├── services/               # [业务逻辑层] 封装核心业务逻辑
 │   │
-│   ├── models/                 # [数据模型层] 定义模型
+│   ├── models/                 # [数据模型层] 定义数据结构和数据库映射
+│   │   ├── schemas.py          # Pydantic模型（请求/响应）
+│   │   └── entities.py         # SQLAlchemy ORM实体类
 │   │
 │   ├── repositories/           # [数据访问层] 封装与数据库的交互
 │   │
@@ -42,9 +48,11 @@ backend/
 │       ├── vectorstores/       # 向量数据库集成
 │       └── utils.py            # AI辅助工具
 │
-└── tests/                      # 测试目录
-    ├── unit/                   # 单元测试
-    └── integration/            # 集成测试
+├── tests/                      # 测试目录
+│   ├── unit/                   # 单元测试
+│   └── integration/            # 集成测试
+│
+└── chroma_db/                  # Chroma存储文件
 
 ## 开发准则
 

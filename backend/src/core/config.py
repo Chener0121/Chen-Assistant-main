@@ -16,8 +16,8 @@ class Settings(BaseSettings):
     DASHSCOPE_API_KEY: str = ""
     DASHSCOPE_BASE_URL: str = ""
 
-    # Chroma (嵌入式向量库)
-    CHROMA_PERSIST_DIR: str = "src/repositories/chroma_data"
+    # Chroma
+    CHROMA_PERSIST_DIR: str = "chroma_db"
 
     # Database
     DATABASE_URL: str = ""

@@ -2,7 +2,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
-from src.config import settings
+from src.core.config import settings
 from src.middleware import register_middleware
 from src.api.v1.router import api_v1_router
 
