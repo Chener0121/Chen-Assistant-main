@@ -80,4 +80,4 @@ Don't create helpers, utilities, or abstractions for one-time operations. Don't 
 **其他**：
 
 - 如果需要新建说明文档（仅开发者可见，非必要不创建），则保存在 `backend/docs/vibe` 文件夹下面
-- 代码更新后要检查文档部分是否有需要更新的地方，文档应该更新最新版（`docs/latest`）
+- 代码更新后要检查文档部分是否有需要更新的地方，文档应该更新最新版（`backend/docs/latest`）
