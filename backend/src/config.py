@@ -12,10 +12,9 @@ class Settings(BaseSettings):
     VERSION: str = "0.1.0"
     DEBUG: bool = False
 
-    # LLM
-    LLM_API_KEY: str = ""
-    LLM_BASE_URL: str = ""
-    LLM_MODEL: str = ""
+    # LLM (DashScope)
+    DASHSCOPE_API_KEY: str = ""
+    DASHSCOPE_BASE_URL: str = ""
 
     # Milvus
     MILVUS_HOST: str = "localhost"
