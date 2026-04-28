@@ -14,10 +14,11 @@ LOADERS = {
     ".docx": Docx2txtLoader,
 }
 
-# 文本切片器
+# 文本切片器（中文标点优先断句，chunk_size 放大以减少公式截断）
 _splitter = RecursiveCharacterTextSplitter(
-    chunk_size=1000,
-    chunk_overlap=200,
+    chunk_size=1500,
+    chunk_overlap=300,
+    separators=["\n\n", "\n", "。", "；", "！", "？", ".", " ", ""],
 )
 
 
