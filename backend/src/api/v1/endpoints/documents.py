@@ -18,7 +18,8 @@ async def upload_document(file: UploadFile) -> Response:
     """上传学习笔记，自动解析、切片、去重、向量化入库"""
     file_bytes = await file.read()
     result = document_service.process_upload(file_bytes, file.filename)
-    return Response(data=result)
+    msg = "文件已存在，跳过处理" if result["skipped"] else "success"
+    return Response(msg=msg, data=result)
 
 
 @router.get("/{doc_id}", summary="获取文档详情")
