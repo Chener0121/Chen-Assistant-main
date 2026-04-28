@@ -1,6 +1,6 @@
 # 项目概述
 
-Chen-Assistant 是基于用户上传的纯文字学习笔记，通过大模型API与LangChain Agent实现知识抽取、检索及智能问答，结合Milvus向量库构建知识图谱，自动识别薄弱知识点并推送关联内容，辅助高效学习。
+Chen-Assistant 是基于用户上传的纯文字学习笔记，通过大模型API与LangChain Agent实现知识抽取、检索及智能问答，结合Chroma向量库构建知识图谱，自动识别薄弱知识点并推送关联内容，辅助高效学习。
 
 ## 项目结构参考 (Project Overview)
 
@@ -28,16 +28,10 @@ backend/
 │   │       └── router.py       # 版本路由汇总
 │   │
 │   ├── services/               # [业务逻辑层] 封装核心业务逻辑
-│   │   ├── user_service.py
-│   │   └── item_service.py
 │   │
-│   ├── models/                 # [数据模型层] 定义数据结构和数据库映射
-│   │   ├── schemas.py          # Pydantic模型（请求/响应）
-│   │   └── entities.py         # SQLAlchemy ORM实体类
+│   ├── models/                 # [数据模型层] 定义模型
 │   │
 │   ├── repositories/           # [数据访问层] 封装与数据库的交互
-│   │   ├── user_repo.py
-│   │   └── item_repo.py
 │   │
 │   └── ai/                     # [AI核心] LangChain/LangGraph模块
 │       ├── agents/             # 智能体定义
