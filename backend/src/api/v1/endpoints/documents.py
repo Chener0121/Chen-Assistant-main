@@ -1,4 +1,5 @@
 from fastapi import APIRouter, UploadFile
+from fastapi.responses import JSONResponse
 
 from src.models.schemas import Response
 from src.services import document_service
@@ -13,13 +14,21 @@ async def list_documents() -> Response:
     return Response(data=docs)
 
 
-@router.post("", summary="上传文档", status_code=201)
+@router.post("", summary="上传文档")
 async def upload_document(file: UploadFile) -> Response:
     """上传学习笔记，自动解析、切片、去重、向量化入库"""
     file_bytes = await file.read()
     result = document_service.process_upload(file_bytes, file.filename)
-    msg = "文件已存在，跳过处理" if result["skipped"] else "success"
-    return Response(msg=msg, data=result)
+
+    if result["skipped"]:
+        # 文件已存在，返回 200 + 提示
+        return Response(msg="文件已存在，跳过处理", data=result)
+
+    # 新文件创建成功，返回 201
+    return JSONResponse(
+        status_code=201,
+        content=Response(data=result).model_dump(),
+    )
 
 
 @router.get("/{doc_id}", summary="获取文档详情")
