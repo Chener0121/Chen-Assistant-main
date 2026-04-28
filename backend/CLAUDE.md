@@ -13,16 +13,16 @@ backend/
 │
 ├── src/                        # 源代码主目录
 │   ├── main.py                 # FastAPI应用入口
-│   ├── config.py               # 全局配置
-│   ├── exceptions.py           # 全局异常处理
-│   ├── dependencies.py         # 全局依赖项
-│   ├── middleware.py           # 中间件
+│   │
 │   ├── utils/                  # 通用工具函数
 │   │   └── helpers.py
 │   │
 │   ├── core/                   # 核心基础设施（数据库连接、LLM客户端、配置等）
 │   │   ├── config.py
-│   │   └── llm_client.py       # llm / embeddings 初始化
+│   │   ├── llm_client.py       # llm / embeddings 初始化
+│   │   ├── exceptions.py       # 全局异常处理
+│   │   ├── dependencies.py     # 全局依赖项
+│   │   └── middleware.py       # 中间件
 │   │
 │   ├── api/                    # [表现层] 处理HTTP请求与响应
 │   │   └── v1/                 # API版本管理
@@ -75,6 +75,7 @@ Don't create helpers, utilities, or abstractions for one-time operations. Don't 
 
 - Python 代码要符合 Python 的规范，符合 pythonic 风格，尽量使用较新的语法，避免使用旧版本的语法（版本兼容到 3.12+）
 - langchain使用较新的语法，避免使用旧版本的语法（参考版本为 v1.2）
+- 代码添加合适的注释
 
 **其他**：
 
