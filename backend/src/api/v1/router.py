@@ -1,10 +1,11 @@
 from fastapi import APIRouter
 
-from src.api.v1.endpoints import users, items, files, qa, graph
+from src.api.v1.endpoints import documents, qa, graph
 
 api_v1_router = APIRouter()
-api_v1_router.include_router(users.router)
-api_v1_router.include_router(items.router)
-api_v1_router.include_router(files.router)
+# 文档上传与管理
+api_v1_router.include_router(documents.router)
+# 智能问答
 api_v1_router.include_router(qa.router)
+# 知识图谱
 api_v1_router.include_router(graph.router)
