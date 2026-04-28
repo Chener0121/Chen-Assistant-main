@@ -19,22 +19,30 @@ def get_vectorstore() -> Chroma:
     return _vectorstore
 
 
-def exists_by_md5(file_md5: str) -> bool:
-    """根据文件 MD5 判断是否已入库"""
+def get_chunk_hashes(file_id: str) -> set[str]:
+    """查询该文件已有的所有 chunk_hash"""
     vs = get_vectorstore()
-    results = vs.get(where={"file_md5": file_md5})
-    return len(results["ids"]) > 0
+    results = vs.get(where={"file_id": file_id}, include=["metadatas"])
+    return {meta["chunk_hash"] for meta in results["metadatas"] or [] if "chunk_hash" in meta}
 
 
-def delete_by_md5(file_md5: str) -> None:
-    """删除该文件 MD5 对应的所有 chunks"""
+def add_chunks(chunks: list, ids: list[str]) -> None:
+    """用指定 id（chunk_hash）将新 chunks 入库"""
     vs = get_vectorstore()
-    results = vs.get(where={"file_md5": file_md5})
+    vs.add_documents(chunks, ids=ids)
+
+
+def delete_chunks(chunk_hashes: list[str]) -> None:
+    """按 chunk_hash 删除指定 chunks"""
+    if not chunk_hashes:
+        return
+    vs = get_vectorstore()
+    vs.delete(chunk_hashes)
+
+
+def delete_by_file_id(file_id: str) -> None:
+    """删除该文件的所有 chunks"""
+    vs = get_vectorstore()
+    results = vs.get(where={"file_id": file_id})
     if results["ids"]:
         vs.delete(results["ids"])
-
-
-def add_documents(chunks: list) -> None:
-    """将 chunks 入库（metadata 中需包含 file_md5）"""
-    vs = get_vectorstore()
-    vs.add_documents(chunks)

@@ -16,28 +16,28 @@ async def list_documents() -> Response:
 
 @router.post("", summary="上传文档")
 async def upload_document(file: UploadFile) -> Response:
-    """上传学习笔记，自动解析、切片、去重、向量化入库"""
+    """上传学习笔记，chunk 级增量 diff，仅 embedding 变化的部分"""
     file_bytes = await file.read()
     result = document_service.process_upload(file_bytes, file.filename)
 
-    if result["skipped"]:
-        # 文件已存在，返回 200 + 提示
-        return Response(msg="文件已存在，跳过处理", data=result)
+    # 完全无变化（added=0, deleted=0）视为已存在
+    if result["added"] == 0 and result["deleted"] == 0:
+        return Response(msg="文件内容未变化，跳过处理", data=result)
 
-    # 新文件创建成功，返回 201
+    # 有新增或更新
     return JSONResponse(
         status_code=201,
         content=Response(data=result).model_dump(),
     )
 
 
-@router.get("/{doc_id}", summary="获取文档详情")
-async def get_document(doc_id: str) -> Response:
-    """根据 doc_id（文件 MD5）查询文档信息"""
-    return Response(data={"doc_id": doc_id})
+@router.get("/{file_id}", summary="获取文档详情")
+async def get_document(file_id: str) -> Response:
+    """根据 file_id 查询文档信息"""
+    return Response(data={"file_id": file_id})
 
 
-@router.delete("/{doc_id}", summary="删除文档", status_code=204)
-async def delete_document(doc_id: str) -> None:
-    """删除文档及其对应的向量数据"""
-    document_service.delete_document(doc_id)
+@router.delete("/{file_id}", summary="删除文档", status_code=204)
+async def delete_document(file_id: str) -> None:
+    """删除文档及其所有向量数据"""
+    document_service.delete_document(file_id)

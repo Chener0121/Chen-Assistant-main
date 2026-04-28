@@ -10,8 +10,8 @@ class Response(BaseModel):
 
 
 class DocumentUploadResult(BaseModel):
-    """文档上传处理结果"""
-    filename: str
-    file_md5: str
-    chunk_count: int
-    skipped: bool = False
+    """文档上传增量处理结果"""
+    file_id: str
+    added: int       # 新增 chunk 数
+    skipped: int     # 已存在跳过的 chunk 数
+    deleted: int     # 被移除的旧 chunk 数

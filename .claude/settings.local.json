@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "Bash(.venv/Scripts/python -c \"from langchain.chat_models import init_chat_model; help\\(init_chat_model\\)\")",
-      "Bash(uv sync *)"
+      "Bash(uv sync *)",
+      "Bash(.venv/Scripts/python *)"
     ]
   }
 }
