@@ -7,6 +7,7 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 from src.ai.vectorstores import chroma_store
 from src.core.exceptions import AppException
+from src.core.llm_client import llm
 
 # 支持的文件类型与对应的 Loader
 LOADERS = {
@@ -25,6 +26,16 @@ _splitter = RecursiveCharacterTextSplitter(
 def _chunk_hash(text: str) -> str:
     """计算 chunk 文本内容的 MD5"""
     return hashlib.md5(text.encode()).hexdigest()
+
+
+def _detect_subject(text: str) -> str:
+    """用 LLM 判断文档内容属于什么学科"""
+    # 取前 800 字符作为样本
+    sample = text[:800]
+    response = llm.invoke(
+        f"请根据以下学习笔记内容，判断它属于哪个学科。只回答学科名称（如：数学、英语、语文、物理、化学、历史、其他），不要解释。\n\n{sample}"
+    )
+    return response.content.strip()
 
 
 def process_upload(file_bytes: bytes, filename: str) -> dict:
@@ -51,11 +62,16 @@ def process_upload(file_bytes: bytes, filename: str) -> dict:
     # 切片，过滤掉空文本 chunk（避免 embedding API 报错）
     chunks = [c for c in _splitter.split_documents(docs) if c.page_content.strip()]
 
+    # 用 LLM 判断学科（取所有 chunk 拼接后的前 800 字）
+    full_text = "\n".join(c.page_content for c in chunks)
+    subject = _detect_subject(full_text)
+
     # 为每个 chunk 计算 chunk_hash，注入 metadata
     for chunk in chunks:
         c_hash = _chunk_hash(chunk.page_content)
         chunk.metadata["file_id"] = file_id
         chunk.metadata["chunk_hash"] = c_hash
+        chunk.metadata["subject"] = subject
 
     # 查询该文件已有的 chunk_hash 集合
     existing_hashes = chroma_store.get_chunk_hashes(file_id)
@@ -87,6 +103,7 @@ def process_upload(file_bytes: bytes, filename: str) -> dict:
 
     return {
         "file_id": file_id,
+        "subject": subject,
         "added": len(new_chunks),
         "skipped": skipped_count,
         "deleted": len(deleted_hashes),
@@ -103,7 +120,10 @@ def list_documents() -> list[dict]:
     for meta in results["metadatas"] or []:
         file_id = meta.get("file_id", "")
         if file_id and file_id not in seen:
-            seen[file_id] = {"file_id": file_id}
+            seen[file_id] = {
+                "file_id": file_id,
+                "subject": meta.get("subject", ""),
+            }
     return list(seen.values())
 
 
