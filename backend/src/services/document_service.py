@@ -130,3 +130,18 @@ def list_documents() -> list[dict]:
 def delete_document(file_id: str) -> None:
     """根据 file_id 删除文档及所有向量数据"""
     chroma_store.delete_by_file_id(file_id)
+
+
+def get_document_detail(file_id: str) -> dict:
+    """根据 file_id 查询文档详情"""
+    vs = chroma_store.get_vectorstore()
+    results = vs.get(where={"file_id": file_id}, include=["metadatas", "documents"])
+
+    if not results["ids"]:
+        raise AppException(status_code=404, msg="文档不存在")
+
+    return {
+        "file_id": file_id,
+        "subject": results["metadatas"][0].get("subject", ""),
+        "chunk_count": len(results["ids"]),
+    }

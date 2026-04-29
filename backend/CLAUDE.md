@@ -74,7 +74,7 @@ Don't create helpers, utilities, or abstractions for one-time operations. Don't 
 注意：
 
 - Python 代码要符合 Python 的规范，符合 pythonic 风格，尽量使用较新的语法，避免使用旧版本的语法（版本兼容到 3.12+）
-- langchain使用较新的语法，避免使用旧版本的语法（参考版本为 v1.2）
+- langchain使用较新的语法，避免使用旧版本的语法（参考版本为 v1.0+）
 - 代码添加合适的注释，采用 RESTful 规范进行开发
 
 **其他**：

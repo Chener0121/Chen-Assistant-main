@@ -33,8 +33,9 @@ async def upload_document(file: UploadFile) -> Response:
 
 @router.get("/{file_id}", summary="获取文档详情")
 async def get_document(file_id: str) -> Response:
-    """根据 file_id 查询文档信息"""
-    return Response(data={"file_id": file_id})
+    """根据 file_id 查询文档详情（学科、chunk 数量等）"""
+    detail = document_service.get_document_detail(file_id)
+    return Response(data=detail)
 
 
 @router.delete("/{file_id}", summary="删除文档", status_code=204)
