@@ -128,7 +128,11 @@ def list_documents() -> list[dict]:
 
 
 def delete_document(file_id: str) -> None:
-    """根据 file_id 删除文档及所有向量数据"""
+    """根据 file_id 删除文档及所有向量数据，不存在则抛出 404"""
+    vs = chroma_store.get_vectorstore()
+    results = vs.get(where={"file_id": file_id})
+    if not results["ids"]:
+        raise AppException(status_code=404, msg="文档不存在")
     chroma_store.delete_by_file_id(file_id)
 
 

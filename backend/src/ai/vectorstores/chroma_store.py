@@ -91,3 +91,12 @@ def get_all_qa_records() -> list[dict]:
     qa = get_qa_store()
     results = qa.get(include=["metadatas"])
     return results["metadatas"] or []
+
+
+def clear_qa_records() -> int:
+    """清空所有问答记录，返回删除的记录数"""
+    qa = get_qa_store()
+    results = qa.get()
+    if results["ids"]:
+        qa.delete(results["ids"])
+    return len(results["ids"])

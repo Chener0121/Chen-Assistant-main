@@ -11,10 +11,11 @@ def ask(question: str, thread_id: str = "default") -> dict:
         config={"configurable": {"thread_id": thread_id}},
     )
 
-    # 结构化输出已自动解析为 QAResult
     result = response["structured_response"].model_dump()
 
-    # 保存问答记录，用于薄弱知识点分析
-    chroma_store.save_qa_record(question, result)
+    # 只有学习相关问题（有知识点或学科）才保存 QA 记录
+    is_learning = bool(result.get("subject") or result.get("knowledge_points"))
+    if is_learning:
+        chroma_store.save_qa_record(question, result)
 
     return result

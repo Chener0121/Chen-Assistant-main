@@ -35,6 +35,7 @@ class DocumentDetail(BaseModel):
 class QARequest(BaseModel):
     """问答请求"""
     question: str
+    thread_id: str = "default"
 
 
 class NoteCorrection(BaseModel):
