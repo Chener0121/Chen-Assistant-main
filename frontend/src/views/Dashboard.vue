@@ -13,26 +13,39 @@
       </div>
     </div>
 
-    <!-- 文档上传 -->
-    <div class="card">
-      <div class="card__header">
-        <FileUp :size="18" />
-        <span>文档上传</span>
-      </div>
-      <el-upload
-        drag
-        :auto-upload="true"
-        :show-file-list="false"
-        accept=".pdf,.docx"
-        :before-upload="beforeUpload"
-        :http-request="handleUpload"
-      >
-        <div class="upload-area">
-          <UploadCloud :size="36" />
-          <p>拖拽文件到此处，或 <em>点击上传</em></p>
-          <span class="upload-area__tip">支持 PDF、DOCX 格式</span>
+    <!-- 提问趋势 + 文档上传 -->
+    <div class="dashboard__row">
+      <div class="card dashboard__chart">
+        <div class="card__header">
+          <TrendingUp :size="18" />
+          <span>提问趋势</span>
+          <div class="chart-tabs">
+            <span :class="{ active: chartMode === 'hourly' }" @click="switchChart('hourly')">近14小时</span>
+            <span :class="{ active: chartMode === 'daily' }" @click="switchChart('daily')">近14天</span>
+          </div>
         </div>
-      </el-upload>
+        <div ref="chartRef" class="chart-container"></div>
+      </div>
+      <div class="card dashboard__upload">
+        <div class="card__header">
+          <FileUp :size="18" />
+          <span>文档上传</span>
+        </div>
+        <el-upload
+          drag
+          :auto-upload="true"
+          :show-file-list="false"
+          accept=".pdf,.docx"
+          :before-upload="beforeUpload"
+          :http-request="handleUpload"
+        >
+          <div class="upload-area">
+            <UploadCloud :size="36" />
+            <p>拖拽文件到此处，或 <em>点击上传</em></p>
+            <span class="upload-area__tip">支持 PDF、DOCX 格式</span>
+          </div>
+        </el-upload>
+      </div>
     </div>
 
     <!-- 文档列表 -->
@@ -83,19 +96,24 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, nextTick } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import * as echarts from 'echarts'
 import {
   FileText, FileUp, FolderOpen, UploadCloud, Trash2,
-  AlertTriangle, BookOpen, Lightbulb, ShieldAlert,
+  AlertTriangle, BookOpen, Lightbulb, ShieldAlert, TrendingUp,
 } from 'lucide-vue-next'
 import { fetchDocuments, uploadDocument, deleteDocument } from '@/apis/document'
-import { fetchWeakPoints } from '@/apis/analytics'
+import { fetchWeakPoints, fetchDailyStats } from '@/apis/analytics'
 import { fetchGraph } from '@/apis/graph'
 
 const documents = ref<any[]>([])
 const weakPoints = ref<any[]>([])
 const kpCount = ref(0)
+const chartRef = ref<HTMLElement>()
+const chartMode = ref('daily')
+
+let chartInstance: echarts.ECharts | null = null
 
 // 统计卡片
 const stats = computed(() => {
@@ -111,10 +129,11 @@ const stats = computed(() => {
 // 加载数据
 async function loadData() {
   try {
-    const [docRes, wpRes, graphRes] = await Promise.allSettled([
+    const [docRes, wpRes, graphRes, dailyRes] = await Promise.allSettled([
       fetchDocuments(),
       fetchWeakPoints(),
       fetchGraph(),
+      fetchDailyStats(chartMode.value),
     ])
     if (docRes.status === 'fulfilled') documents.value = docRes.value.data || []
     if (wpRes.status === 'fulfilled') weakPoints.value = wpRes.value.data || []
@@ -122,7 +141,65 @@ async function loadData() {
       const nodes = graphRes.value.data?.nodes || []
       kpCount.value = nodes.filter((n: any) => n.type === 'knowledge_point').length
     }
+    if (dailyRes.status === 'fulfilled') {
+      await nextTick()
+      renderChart(dailyRes.value.data || { dates: [], subjects: [], series: {} })
+    }
   } catch { /* ignore */ }
+}
+
+async function switchChart(mode: string) {
+  chartMode.value = mode
+  try {
+    const res: any = await fetchDailyStats(mode)
+    await nextTick()
+    renderChart(res.data || { dates: [], subjects: [], series: {} })
+  } catch { /* ignore */ }
+}
+
+const CHART_COLORS = ['#3996ae', '#5AD8A6', '#F6BD16', '#F27C7C', '#9581CC', '#6DC8EC']
+
+function renderChart(data: { dates: string[]; subjects: string[]; series: Record<string, number[]> }) {
+  if (!chartRef.value) return
+  if (!chartInstance) {
+    chartInstance = echarts.init(chartRef.value)
+  }
+  const seriesList = data.subjects.map((subject, i) => ({
+    name: subject,
+    type: 'bar' as const,
+    stack: 'total',
+    barWidth: 38,
+    data: data.series[subject] || [],
+    itemStyle: { color: CHART_COLORS[i % CHART_COLORS.length], borderRadius: [2, 2, 0, 0] },
+  }))
+  chartInstance.setOption({
+    grid: { top: 20, right: 20, bottom: 50, left: 40 },
+    legend: {
+      bottom: 0,
+      left: 'center',
+      textStyle: { color: '#979999', fontSize: 11 },
+    },
+    xAxis: {
+      type: 'category',
+      data: data.dates,
+      axisLine: { lineStyle: { color: '#d7d9d9' } },
+      axisLabel: { color: '#979999', fontSize: 11 },
+    },
+    yAxis: {
+      type: 'value',
+      minInterval: 1,
+      axisLine: { show: false },
+      splitLine: { lineStyle: { color: '#eef0f0' } },
+      axisLabel: { color: '#979999', fontSize: 11 },
+    },
+    series: seriesList,
+    tooltip: {
+      trigger: 'axis',
+      backgroundColor: '#fff',
+      borderColor: '#e5e7eb',
+      textStyle: { color: '#1e1f1f', fontSize: 12 },
+    },
+  })
 }
 
 // 上传
@@ -203,6 +280,31 @@ onMounted(loadData)
   margin-bottom: 16px;
 }
 
+.chart-tabs {
+  margin-left: auto;
+  display: flex;
+  gap: 2px;
+  background: var(--gray-100);
+  border-radius: 6px;
+  padding: 2px;
+
+  span {
+    padding: 3px 10px;
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--gray-500);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &.active {
+      background: var(--main-0);
+      color: var(--main-800);
+      font-weight: 500;
+    }
+  }
+}
+
 /* 统计卡片 */
 .dashboard__stats {
   display: grid;
@@ -244,7 +346,7 @@ onMounted(loadData)
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 24px 0;
+  padding: 12px 0;
   color: var(--gray-500);
 
   em {
@@ -253,14 +355,46 @@ onMounted(loadData)
   }
 
   p {
-    margin: 8px 0 4px;
-    font-size: 14px;
+    margin: 6px 0 2px;
+    font-size: 13px;
   }
 }
 
 .upload-area__tip {
   font-size: 12px;
   color: var(--gray-400);
+}
+
+/* 折线图 */
+.chart-container {
+  height: 240px;
+}
+
+/* 趋势 + 上传同行 */
+.dashboard__row {
+  display: flex;
+  gap: 16px;
+}
+
+.dashboard__chart {
+  flex: 6;
+}
+
+.dashboard__upload {
+  flex: 4;
+  display: flex;
+  flex-direction: column;
+
+  :deep(.el-upload) {
+    flex: 1;
+  }
+
+  :deep(.el-upload-dragger) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+  }
 }
 
 /* 文档列表 */

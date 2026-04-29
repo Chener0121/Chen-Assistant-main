@@ -86,3 +86,46 @@ def list_weak_points() -> list[dict]:
     results.sort(key=lambda x: level_order.get(x["level"], 3))
 
     return results
+
+
+def daily_stats(mode: str = "daily") -> dict:
+    """统计提问次数，按学科分组。mode=daily 按14天，mode=hourly 按14小时"""
+    records = chroma_store.get_all_qa_records()
+    now = datetime.now()
+
+    if mode == "hourly":
+        # 近 14 小时
+        slots = [(now - timedelta(hours=i)).strftime("%Y-%m-%d %H:00") for i in range(13, -1, -1)]
+    else:
+        # 近 14 天
+        slots = [(now - timedelta(days=i)).strftime("%Y-%m-%d") for i in range(13, -1, -1)]
+
+    slot_set = set(slots)
+
+    # 按时间槽+学科聚合
+    subject_set: set[str] = set()
+    counter: dict[tuple[str, str], int] = {}
+    for record in records:
+        ts_str = record.get("timestamp", "")
+        try:
+            ts = datetime.fromisoformat(ts_str)
+        except (ValueError, TypeError):
+            continue
+        slot = ts.strftime("%Y-%m-%d %H:00") if mode == "hourly" else ts.strftime("%Y-%m-%d")
+        if slot not in slot_set:
+            continue
+        subject = record.get("subject", "")
+        if not subject:
+            continue
+        subject_set.add(subject)
+        counter[(slot, subject)] = counter.get((slot, subject), 0) + 1
+
+    # 构建 series
+    subjects = sorted(subject_set)
+    series = {}
+    for s in subjects:
+        series[s] = [counter.get((sl, s), 0) for sl in slots]
+
+    # 缩短标签显示
+    labels = [s[5:] if mode == "daily" else s[11:] for s in slots]
+    return {"dates": labels, "subjects": subjects, "series": series}

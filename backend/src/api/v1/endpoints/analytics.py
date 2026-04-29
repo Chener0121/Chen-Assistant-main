@@ -18,3 +18,10 @@ async def list_weak_points() -> Response:
 async def clear_qa_records() -> None:
     """清空所有问答记录（不影响文档向量数据）"""
     chroma_store.clear_qa_records()
+
+
+@router.get("/daily-stats", summary="提问统计")
+async def get_daily_stats(mode: str = "daily") -> Response:
+    """mode=daily 近14天，mode=hourly 近14小时"""
+    stats = analytics_service.daily_stats(mode)
+    return Response(data=stats)
