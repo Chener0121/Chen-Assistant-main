@@ -1,16 +1,23 @@
 import axios from 'axios'
 
+interface ApiResponse {
+  code: number
+  msg: string
+  data: any
+}
+
 const api = axios.create({
   baseURL: '/api/v1',
   timeout: 30000,
 })
 
 api.interceptors.response.use(
-  (res) => {
-    if (res.data.code !== 200 && res.data.code !== 201) {
-      return Promise.reject(new Error(res.data.msg || '请求失败'))
+  (res): any => {
+    const body = res.data as ApiResponse
+    if (body.code !== 200 && body.code !== 201) {
+      return Promise.reject(new Error(body.msg || '请求失败'))
     }
-    return res.data
+    return body
   },
   (err) => {
     return Promise.reject(err)
