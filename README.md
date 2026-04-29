@@ -82,8 +82,7 @@
 # 后端
 cd backend
 uv sync
-.venv\Scripts\activate
-uv run python main.py
+.venv\Scripts\activate + python main.py 或 uv run python main.py
 
 # 前端
 cd frontend

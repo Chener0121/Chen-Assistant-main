@@ -6,8 +6,7 @@ Chen-Assistant 后端服务，基于 FastAPI + LangChain Chain 构建。
 
 ```bash
 uv sync
-.venv\Scripts\activate
-uv run python main.py
+.venv\Scripts\activate + python main.py 或 uv run python main.py
 ```
 
 服务地址：http://127.0.0.1:8000
