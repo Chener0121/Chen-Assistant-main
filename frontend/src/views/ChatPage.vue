@@ -94,7 +94,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, nextTick, onMounted } from 'vue'
+import { ref, nextTick, onMounted, watch } from 'vue'
 import katex from 'katex'
 import { marked } from 'marked'
 import 'katex/dist/katex.min.css'
@@ -212,6 +212,10 @@ async function sendMessage() {
 
 onMounted(() => {
   chatStore.load()
+})
+
+watch(() => chatStore.activeId, () => {
+  scrollToBottom()
 })
 </script>
 
