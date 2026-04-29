@@ -1,6 +1,6 @@
 # 🎓 知识图谱智学助手(Chen-Assistant)
 
-基于上传的学习笔记，通过大模型 API 与 LangChain Agent 实现知识抽取、检索及智能问答，结合 Chroma 向量库自动识别薄弱知识点并推送关联内容，辅助高效学习。
+基于上传的学习笔记，通过大模型 API 与 LangChain Chain 实现知识抽取、检索及智能问答，结合 Chroma 向量库自动识别薄弱知识点并推送关联内容，辅助高效学习。
 
 *Here is a dream.*
 
@@ -16,19 +16,19 @@
 - 文档列表查询（含 chunk 数量）、详情查看、删除
 
 ### 🤖 智能问答
-- LangChain Agent 驱动（create_agent + 结构化输出）
-- 多工具协同：笔记检索（search_notes）、薄弱知识点查询、历史提问查询
+- LangChain Chain 驱动（prompt | llm.with_structured_output，1 次 LLM 调用）
+- 代码自动判断意图：笔记检索 / 薄弱点查询，无需 Agent 决策
 - 学科过滤检索，避免跨学科内容干扰
 - 笔记纠错：自动指出笔记中的错误并给出正确解释
 - 笔记缺失提醒：笔记中没有的知识点会提示补充
-- 多轮对话记忆（thread_id 会话隔离，MemorySaver）
+- 多轮对话（thread_id 会话隔离）
 - 闲聊支持：非学习问题正常回答，不污染学习数据
 - LaTeX 公式 + Markdown 渲染
 
 ### 📊 学习分析
 - 薄弱知识点自动识别（高频提问 + 笔记缺失 + 笔记纠错）
 - 时间衰减机制（30/60 天分级降级）
-- 对话中可查询薄弱项，Agent 结合图谱推荐关联内容
+- 对话中可查询薄弱项（代码关键词匹配 → 直接查数据）
 - 近 14 天 / 14 小时提问趋势统计（按学科分组堆叠柱状图）
 
 ### 🕸️ 知识图谱
@@ -92,7 +92,7 @@ Chen-Assistant/
 │   │   ├── api/v1/endpoints/ # RESTful API 路由
 │   │   ├── services/         # 业务逻辑层
 │   │   ├── models/           # Pydantic 数据模型
-│   │   ├── ai/               # Agent / 工具 / Prompt / 向量库
+│   │   ├── ai/               # Chain / 检索 / Prompt / 向量库
 │   │   └── utils/            # 通用工具
 │   ├── docs/                 # 接口文档
 │   ├── chroma_db/            # Chroma 持久化数据

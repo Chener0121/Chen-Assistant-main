@@ -212,7 +212,7 @@ Base URL: `http://127.0.0.1:8000`
 
 `POST /api/v1/qa`
 
-基于向量检索 + Agent 的智能问答，支持多轮对话。
+基于向量检索 + Chain 的智能问答，支持多轮对话。代码自动判断意图（笔记检索 / 薄弱点查询），1 次 LLM 调用完成。
 
 **请求**
 
@@ -450,7 +450,7 @@ Base URL: `http://127.0.0.1:8000`
 | 条件 | 等级 |
 |------|------|
 | 有笔记纠错（correction_count > 0） | high |
-| 笔记缺失（missing_count > 0） | medium |
+| 笔记缺失（missing_count >= 2） | medium |
 | 反复提问（ask_count >= 3） | low |
 
 **时间衰减规则**
