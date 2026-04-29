@@ -28,14 +28,25 @@ def _chunk_hash(text: str) -> str:
     return hashlib.md5(text.encode()).hexdigest()
 
 
+# 可选学科列表
+_SUBJECTS = ["数学", "语文", "英语", "物理", "化学", "历史", "地理", "生物", "政治"]
+
+
 def _detect_subject(text: str) -> str:
     """用 LLM 判断文档内容属于什么学科"""
     sample = text[:800]
-    response = llm.invoke(
-        f"请根据以下学习笔记内容，判断它属于哪个学科。只回答学科名称（如：数学、英语、语文、物理、化学、历史、其他），不要解释。\n\n{sample}"
-    )
-    # 只取第一个词作为学科名，防止 LLM 返回多余内容
-    return response.content.strip().split()[0].strip("：:，,。.、")
+    subjects_str = "、".join(_SUBJECTS)
+    prompt = "请判断以下学习笔记属于哪个学科。只回答一个学科名称，不要解释。\n仅限以下选项：" + subjects_str + "、其他。不属于任何学科的都回答其他。\n\n" + sample
+    response = llm.invoke(prompt)
+    content = response.content.strip()
+    # 精确匹配：去掉常见后缀再比对
+    cleaned = content.rstrip("学课科目类别")
+    for subject in _SUBJECTS:
+        if cleaned == subject:
+            return subject
+    if "其他" in content:
+        return "其他"
+    return "其他"
 
 
 def process_upload(file_bytes: bytes, filename: str) -> dict:

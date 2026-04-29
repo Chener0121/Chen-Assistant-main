@@ -13,6 +13,7 @@ const api = axios.create({
 
 api.interceptors.response.use(
   (res): any => {
+    if (res.status === 204) return res
     const body = res.data as ApiResponse
     if (body.code !== 200 && body.code !== 201) {
       return Promise.reject(new Error(body.msg || '请求失败'))
