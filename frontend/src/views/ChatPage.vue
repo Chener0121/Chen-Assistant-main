@@ -73,17 +73,20 @@
 
         <!-- 输入区域 -->
         <div class="chat-input">
-          <textarea
-            ref="inputRef"
-            v-model="inputText"
-            placeholder="输入你的问题..."
-            rows="1"
-            @input="autoResize"
-            @keydown="handleKeydown"
-          ></textarea>
-          <button class="chat-input__send" :disabled="!inputText.trim() || chatStore.loading" @click="sendMessage">
-            <ArrowUp :size="18" />
-          </button>
+          <div class="chat-input__wrapper">
+            <textarea
+              ref="inputRef"
+              v-model="inputText"
+              placeholder="输入你的问题..."
+              rows="1"
+              @input="autoResize"
+              @keydown="handleKeydown"
+            ></textarea>
+            <button class="chat-input__send" :disabled="!inputText.trim() || chatStore.loading" @click="sendMessage">
+              <ArrowUp :size="18" />
+            </button>
+          </div>
+          <p class="chat-input__disclaimer">内容由 AI 生成，请仔细甄别</p>
         </div>
       </template>
     </div>
@@ -467,15 +470,24 @@ onMounted(() => {
 
 /* 输入区域 */
 .chat-input {
+  padding: 0 32px 0px;
+}
+
+.chat-input__disclaimer {
+  text-align: center;
+  font-size: 11px;
+  color: var(--gray-400);
+  margin-top: 6px;
+}
+
+.chat-input__wrapper {
+  position: relative;
   display: flex;
   align-items: flex-end;
-  gap: 12px;
-  padding: 16px 32px 20px;
-  border-top: 1px solid var(--gray-200);
 
   textarea {
-    flex: 1;
-    padding: 10px 14px;
+    width: 100%;
+    padding: 10px 48px 10px 14px;
     border: 1px solid var(--gray-200);
     border-radius: 12px;
     font-size: 14px;
@@ -499,10 +511,13 @@ onMounted(() => {
 }
 
 .chat-input__send {
-  width: 36px;
-  height: 36px;
+  position: absolute;
+  right: 6px;
+  bottom: 6px;
+  width: 32px;
+  height: 32px;
   border: none;
-  border-radius: 10px;
+  border-radius: 50%;
   background: var(--color-primary-500);
   color: var(--main-0);
   display: flex;
