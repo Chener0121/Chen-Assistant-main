@@ -1,6 +1,9 @@
 <template>
   <div class="header">
-    <span class="header__title">Chen-Assistant</span>
+    <div class="header__left">
+      <span class="header__title">Chen-Assistant</span>
+      <span class="header__subtitle">大模型驱动的知识图谱智学助手</span>
+    </div>
     <span class="header__time">{{ currentTime }}</span>
   </div>
 </template>
@@ -46,10 +49,21 @@ onUnmounted(() => {
   flex-shrink: 0;
 }
 
+.header__left {
+  display: flex;
+  flex-direction: column;
+}
+
 .header__title {
   font-size: 16px;
   font-weight: 600;
   color: var(--main-800);
+  line-height: 1.3;
+}
+
+.header__subtitle {
+  font-size: 12px;
+  color: var(--gray-500);
 }
 
 .header__time {

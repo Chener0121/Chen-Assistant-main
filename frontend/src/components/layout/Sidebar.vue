@@ -85,8 +85,8 @@ const menuItems = [
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 36px;
-    height: 36px;
+    width: 34px;
+    height: 34px;
     border-radius: 8px;
     background: var(--gray-100);
     color: var(--gray-600);
