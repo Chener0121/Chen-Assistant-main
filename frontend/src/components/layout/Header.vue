@@ -4,27 +4,26 @@
       <span class="header__title">Chen-Assistant</span>
       <span class="header__subtitle">大模型驱动的知识图谱智学助手</span>
     </div>
-    <span class="header__time">{{ currentTime }}</span>
+    <span class="header__time"><Clock :size="15" /> {{ currentTime }}</span>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
+import { Clock } from 'lucide-vue-next'
 
 const currentTime = ref('')
 let timer: number
 
 function updateTime() {
   const now = new Date()
-  currentTime.value = now.toLocaleString('zh-CN', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-    hour12: false,
-  })
+  const y = now.getFullYear()
+  const m = now.getMonth() + 1
+  const d = now.getDate()
+  const hh = String(now.getHours()).padStart(2, '0')
+  const mm = String(now.getMinutes()).padStart(2, '0')
+  const ss = String(now.getSeconds()).padStart(2, '0')
+  currentTime.value = `${y}年${m}月${d}日 ${hh}:${mm}:${ss}`
 }
 
 onMounted(() => {
@@ -39,13 +38,14 @@ onUnmounted(() => {
 
 <style scoped lang="less">
 .header {
-  height: 56px;
+  height: 64px;
   padding: 0 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: var(--main-0);
-  border-bottom: 1px solid var(--gray-200);
+  background: var(--gray-25);
+  // background: var(--main-0);
+  // border-bottom: 1px solid var(--gray-200);
   flex-shrink: 0;
 }
 
@@ -67,8 +67,11 @@ onUnmounted(() => {
 }
 
 .header__time {
+  display: flex;
+  align-items: center;
+  gap: 4px;
   font-size: 13px;
-  color: var(--gray-500);
+  color: var(--gray-1000);
   font-variant-numeric: tabular-nums;
 }
 </style>

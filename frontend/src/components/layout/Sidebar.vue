@@ -15,7 +15,7 @@
         :class="{ 'is-active': route.path === item.path }"
       >
         <span class="sidebar__icon">
-          <component :is="item.icon" :size="20" />
+          <component :is="item.icon" :size="18" />
         </span>
       </router-link>
     </nav>
@@ -48,7 +48,7 @@ const menuItems = [
 }
 
 .sidebar__logo {
-  height: 56px;
+  height: 64px;
   display: flex;
   align-items: center;
   justify-content: center;
