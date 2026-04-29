@@ -36,6 +36,13 @@ class QARequest(BaseModel):
     """问答请求"""
     question: str
     thread_id: str = "default"
+    history: list[dict] = []     # [{"role": "human"/"ai", "content": "..."}]
+    summary: str = ""            # 旧对话摘要
+
+
+class SummarizeRequest(BaseModel):
+    """摘要压缩请求"""
+    messages: list[dict]
 
 
 class NoteCorrection(BaseModel):

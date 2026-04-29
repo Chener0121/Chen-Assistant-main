@@ -100,7 +100,7 @@ import { marked } from 'marked'
 import 'katex/dist/katex.min.css'
 import { Plus, MessageSquare, Trash2, Bot, User, ArrowUp } from 'lucide-vue-next'
 import { useChatStore } from '@/stores/chat'
-import { askQuestion } from '@/apis/qa'
+import { askQuestion, summarizeMessages } from '@/apis/qa'
 
 const chatStore = useChatStore()
 const inputText = ref('')
@@ -200,8 +200,19 @@ async function sendMessage() {
 
   chatStore.loading = true
   try {
-    const res: any = await askQuestion(text, chatStore.activeId)
+    const history = chatStore.getRecentHistory()
+    const summary = chatStore.activeConversation?.summary || ''
+    const res: any = await askQuestion(text, chatStore.activeId, history, summary)
     chatStore.addAssistantMessage(res.data.answer, res.data)
+
+    // 检查是否需要摘要压缩
+    const toCompress = chatStore.getMessagesToCompress()
+    if (toCompress) {
+      try {
+        const sumRes: any = await summarizeMessages(toCompress)
+        chatStore.applyCompression(sumRes.data.summary)
+      } catch { /* 压缩失败不影响主流程 */ }
+    }
   } catch (e: any) {
     chatStore.addAssistantMessage('抱歉，出了点问题，请稍后重试。')
   } finally {

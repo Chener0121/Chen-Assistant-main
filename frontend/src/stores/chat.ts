@@ -11,10 +11,16 @@ export interface Conversation {
   id: string
   title: string
   messages: Message[]
+  summary: string      // 旧消息的压缩摘要
   createdAt: string
 }
 
 const STORAGE_KEY = 'chen-chat'
+
+// 未压缩消息超过此数量时触发摘要压缩
+const COMPRESS_THRESHOLD = 20
+// 每次压缩处理的消息数
+const COMPRESS_BATCH = 10
 
 export const useChatStore = defineStore('chat', () => {
   const conversations = ref<Conversation[]>([])
@@ -32,6 +38,10 @@ export const useChatStore = defineStore('chat', () => {
         const data = JSON.parse(raw)
         conversations.value = data.conversations || []
         activeId.value = data.activeId || ''
+        // 兼容没有 summary 字段的旧会话
+        conversations.value.forEach(c => {
+          if (c.summary === undefined) c.summary = ''
+        })
       }
     } catch { /* ignore */ }
   }
@@ -48,6 +58,7 @@ export const useChatStore = defineStore('chat', () => {
       id: Date.now().toString(),
       title: '新对话',
       messages: [],
+      summary: '',
       createdAt: new Date().toISOString(),
     }
     conversations.value.unshift(conv)
@@ -85,6 +96,39 @@ export const useChatStore = defineStore('chat', () => {
     save()
   }
 
+  /** 获取最近 10 条消息作为 history 发给后端 */
+  function getRecentHistory(): { role: string, content: string }[] {
+    const conv = activeConversation.value
+    if (!conv) return []
+    const recent = conv.messages.slice(-10)
+    return recent.map(m => ({
+      role: m.role === 'user' ? 'human' : 'ai',
+      content: m.content,
+    }))
+  }
+
+  /** 检查是否需要压缩，如果需要返回待压缩的消息 */
+  function getMessagesToCompress(): { role: string, content: string }[] | null {
+    const conv = activeConversation.value
+    if (!conv || conv.messages.length <= COMPRESS_THRESHOLD) return null
+    const batch = conv.messages.slice(0, COMPRESS_BATCH)
+    return batch.map(m => ({
+      role: m.role === 'user' ? 'human' : 'ai',
+      content: m.content,
+    }))
+  }
+
+  /** 压缩完成后更新 summary 并移除已压缩的消息 */
+  function applyCompression(summary: string) {
+    const conv = activeConversation.value
+    if (!conv) return
+    conv.summary = conv.summary
+      ? conv.summary + '\n' + summary
+      : summary
+    conv.messages = conv.messages.slice(COMPRESS_BATCH)
+    save()
+  }
+
   return {
     conversations,
     activeId,
@@ -96,5 +140,8 @@ export const useChatStore = defineStore('chat', () => {
     deleteConversation,
     addUserMessage,
     addAssistantMessage,
+    getRecentHistory,
+    getMessagesToCompress,
+    applyCompression,
   }
 })
