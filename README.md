@@ -1,4 +1,4 @@
-# 🎓 Chen-Assistant
+# 🎓 知识图谱智学助手(Chen-Assistant)
 
 基于上传的学习笔记，通过大模型 API 与 LangChain Agent 实现知识抽取、检索及智能问答，结合 Chroma 向量库自动识别薄弱知识点并推送关联内容，辅助高效学习。
 
