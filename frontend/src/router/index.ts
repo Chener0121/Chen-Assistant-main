@@ -1,13 +1,26 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '@/views/HomeView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: '/',
-      name: 'home',
-      component: HomeView,
+      redirect: '/dashboard',
+    },
+    {
+      path: '/dashboard',
+      name: 'dashboard',
+      component: () => import('@/views/Dashboard.vue'),
+    },
+    {
+      path: '/chat',
+      name: 'chat',
+      component: () => import('@/views/ChatPage.vue'),
+    },
+    {
+      path: '/graph',
+      name: 'graph',
+      component: () => import('@/views/GraphPage.vue'),
     },
   ],
 })
