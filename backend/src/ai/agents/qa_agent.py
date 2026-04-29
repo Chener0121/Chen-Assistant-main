@@ -13,7 +13,7 @@ _memory = MemorySaver()
 
 # 创建问答 Agent
 qa_agent = create_agent(
-    llm,
+    model=llm,
     tools=[search_notes, query_weak_points, query_qa_history],
     system_prompt=QA_SYSTEM_PROMPT,
     response_format=QAResult,
