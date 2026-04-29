@@ -153,3 +153,8 @@
   scrollbar-width: thin;
   scrollbar-color: var(--gray-200) transparent;
 }
+
+body {
+  margin: 0;
+  overflow: hidden;
+}

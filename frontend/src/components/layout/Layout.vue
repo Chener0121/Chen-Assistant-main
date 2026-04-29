@@ -34,5 +34,10 @@ import Header from './Header.vue'
   overflow-y: auto;
   padding: 20px;
   background: var(--gray-25);
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 </style>

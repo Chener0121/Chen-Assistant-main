@@ -57,8 +57,8 @@ const menuItems = [
 }
 
 .sidebar__logo-img {
-  width: 45px;
-  height: 45px;
+  width: 42px;
+  height: 42px;
   border-radius: 8px;
   object-fit: cover;
 }
