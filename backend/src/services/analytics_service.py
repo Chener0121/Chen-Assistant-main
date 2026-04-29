@@ -58,7 +58,7 @@ def list_weak_points() -> list[dict]:
         # 计算原始等级
         if stat["correction_count"] > 0:
             level = "high"
-        elif stat["missing_count"] > 0:
+        elif stat["missing_count"] >= 2:
             level = "medium"
         elif stat["ask_count"] >= 3:
             level = "low"

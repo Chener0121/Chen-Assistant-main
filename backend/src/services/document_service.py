@@ -30,12 +30,12 @@ def _chunk_hash(text: str) -> str:
 
 def _detect_subject(text: str) -> str:
     """用 LLM 判断文档内容属于什么学科"""
-    # 取前 800 字符作为样本
     sample = text[:800]
     response = llm.invoke(
         f"请根据以下学习笔记内容，判断它属于哪个学科。只回答学科名称（如：数学、英语、语文、物理、化学、历史、其他），不要解释。\n\n{sample}"
     )
-    return response.content.strip()
+    # 只取第一个词作为学科名，防止 LLM 返回多余内容
+    return response.content.strip().split()[0].strip("：:，,。.、")
 
 
 def process_upload(file_bytes: bytes, filename: str) -> dict:

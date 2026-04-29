@@ -60,7 +60,7 @@
           <div class="doc-item__info">
             <FileText :size="16" />
             <span class="doc-item__name">{{ doc.file_id }}</span>
-            <el-tag size="small" :type="subjectTagType(doc.subject)">{{ doc.subject }}</el-tag>
+            <el-tag size="small" :color="subjectColor(doc.subject)" style="color: #fff; border: none;">{{ doc.subject }}</el-tag>
           </div>
           <div class="doc-item__actions">
             <span class="doc-item__chunks">{{ doc.chunk_count }} 个片段</span>
@@ -204,9 +204,15 @@ function renderChart(data: { dates: string[]; subjects: string[]; series: Record
 
 // 上传
 function beforeUpload(file: File) {
-  const valid = file.name.endsWith('.pdf') || file.name.endsWith('.docx')
-  if (!valid) ElMessage.error('仅支持 PDF、DOCX 格式')
-  return valid
+  if (!file.name.endsWith('.pdf') && !file.name.endsWith('.docx')) {
+    ElMessage.error('仅支持 PDF、DOCX 格式')
+    return false
+  }
+  if (file.size === 0) {
+    ElMessage.error('文件为空，请选择有效文件')
+    return false
+  }
+  return true
 }
 
 async function handleUpload(options: any) {
@@ -234,12 +240,21 @@ async function handleDelete(fileId: string) {
 }
 
 // 学科标签颜色
-function subjectTagType(subject: string) {
-  const map: Record<string, string> = {
-    '数学': 'primary', '语文': 'success', '英语': 'warning',
-    '物理': 'danger', '化学': 'info',
-  }
-  return map[subject] || 'info'
+const SUBJECT_COLORS: Record<string, string> = {
+  '数学': 'rgba(57,150,174,0.75)',
+  '语文': 'rgba(90,216,166,0.75)',
+  '英语': 'rgba(246,189,22,0.75)',
+  '物理': 'rgba(242,124,124,0.75)',
+  '化学': 'rgba(149,129,204,0.75)',
+  '历史': 'rgba(109,200,236,0.75)',
+  '地理': 'rgba(255,157,77,0.75)',
+  '生物': 'rgba(146,208,80,0.75)',
+  '政治': 'rgba(232,133,186,0.75)',
+  '其他': 'rgba(140,140,140,0.75)',
+}
+
+function subjectColor(subject: string) {
+  return SUBJECT_COLORS[subject] || '#8C8C8C'
 }
 
 // 薄弱等级

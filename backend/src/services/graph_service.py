@@ -125,7 +125,7 @@ def list_weak_points() -> list[dict]:
     for point in sorted_points:
         if point["correction_count"] > 0:
             point["level"] = "high"
-        elif point["missing_count"] > 0:
+        elif point["missing_count"] > 2:
             point["level"] = "medium"
         elif point["ask_count"] >= 3:
             point["level"] = "low"
