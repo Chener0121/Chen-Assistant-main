@@ -113,11 +113,13 @@ Base URL: `http://127.0.0.1:8000`
   "data": [
     {
       "file_id": "高数笔记_第一章",
-      "subject": "数学"
+      "subject": "数学",
+      "chunk_count": 15
     },
     {
       "file_id": "英语笔记_Unit3",
-      "subject": "英语"
+      "subject": "英语",
+      "chunk_count": 8
     }
   ]
 }
@@ -129,6 +131,7 @@ Base URL: `http://127.0.0.1:8000`
 |------|------|------|
 | file_id | string | 文档唯一标识 |
 | subject | string | 所属学科 |
+| chunk_count | int | 文档的 chunk（切片）数量 |
 
 ---
 

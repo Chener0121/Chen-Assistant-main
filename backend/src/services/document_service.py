@@ -115,15 +115,20 @@ def list_documents() -> list[dict]:
     vs = chroma_store.get_vectorstore()
     results = vs.get(include=["metadatas"])
 
-    # 按 file_id 去重，聚合文档信息
+    # 按 file_id 去重，聚合文档信息和 chunk 计数
     seen: dict[str, dict] = {}
     for meta in results["metadatas"] or []:
         file_id = meta.get("file_id", "")
-        if file_id and file_id not in seen:
+        if not file_id:
+            continue
+        if file_id not in seen:
             seen[file_id] = {
                 "file_id": file_id,
                 "subject": meta.get("subject", ""),
+                "chunk_count": 1,
             }
+        else:
+            seen[file_id]["chunk_count"] += 1
     return list(seen.values())
 
 
