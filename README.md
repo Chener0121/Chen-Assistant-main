@@ -77,6 +77,8 @@ npm install
 npm run dev
 ```
 
+> **首次使用请先上传学习笔记（PDF/DOCX），否则问答和仪表盘无数据。**
+
 后端 API 文档：http://127.0.0.1:8000/docs
 前端开发地址：http://localhost:5173
 

@@ -1,0 +1,21 @@
+# IDE
+.idea/
+
+# Chroma 向量数据库（包含用户个人数据）
+backend/chroma_db/
+
+# 环境变量
+.env
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# 前端
+frontend/node_modules/
+frontend/dist/
+
+# 系统文件
+.DS_Store
+Thumbs.db
