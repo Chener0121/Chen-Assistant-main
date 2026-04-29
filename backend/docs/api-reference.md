@@ -221,7 +221,12 @@ Base URL: `http://127.0.0.1:8000`
 ```json
 {
   "question": "极限的定义是什么？",
-  "thread_id": "default"
+  "thread_id": "default",
+  "history": [
+    {"role": "human", "content": "什么是函数？"},
+    {"role": "ai", "content": "函数是一种映射关系..."}
+  ],
+  "summary": ""
 }
 ```
 
@@ -229,6 +234,8 @@ Base URL: `http://127.0.0.1:8000`
 |------|------|------|--------|------|
 | question | string | 是 | - | 用户提问内容 |
 | thread_id | string | 否 | "default" | 会话 ID，用于多轮对话隔离 |
+| history | array | 否 | [] | 最近 10 条对话历史，`role` 为 `human` 或 `ai` |
+| summary | string | 否 | "" | 旧消息的压缩摘要，由前端维护 |
 
 **响应**
 
@@ -299,9 +306,50 @@ Base URL: `http://127.0.0.1:8000`
 
 ---
 
-## 3. 知识图谱
+## 3. 对话管理
 
-### 3.1 获取知识图谱
+### 3.1 对话摘要压缩
+
+`POST /api/v1/conversations/summarize`
+
+将旧对话消息压缩为摘要，减少多轮对话的 token 开销。由前端在消息超过 20 条时自动调用。
+
+**请求**
+
+- Content-Type: `application/json`
+
+```json
+{
+  "messages": [
+    {"role": "human", "content": "极限的定义是什么？"},
+    {"role": "ai", "content": "极限的定义是..."},
+    {"role": "human", "content": "能举个例子吗？"},
+    {"role": "ai", "content": "比如当 x 趋近于 0 时..."}
+  ]
+}
+```
+
+| 字段 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| messages | array | 是 | 待压缩的对话消息列表，每项含 `role`（`human`/`ai`）和 `content` |
+
+**响应**
+
+```json
+{
+  "code": 200,
+  "msg": "success",
+  "data": {
+    "summary": "用户询问了极限的定义，助手解释了 ε-δ 语言的定义，并举了 x 趋近于 0 的例子。"
+  }
+}
+```
+
+---
+
+## 4. 知识图谱
+
+### 4.1 获取知识图谱
 
 `GET /api/v1/graph`
 
@@ -375,9 +423,9 @@ Base URL: `http://127.0.0.1:8000`
 
 ---
 
-## 4. 学习分析
+## 5. 学习分析
 
-### 4.1 获取薄弱知识点
+### 5.1 获取薄弱知识点
 
 `GET /api/v1/analytics/weak-points`
 
@@ -463,7 +511,7 @@ Base URL: `http://127.0.0.1:8000`
 
 ---
 
-### 4.2 提问统计
+### 5.2 提问统计
 
 `GET /api/v1/analytics/daily-stats`
 
@@ -532,7 +580,7 @@ Base URL: `http://127.0.0.1:8000`
 
 ---
 
-### 4.3 清空问答记录
+### 5.3 清空问答记录
 
 `DELETE /api/v1/analytics/qa-records`
 
@@ -546,9 +594,9 @@ Base URL: `http://127.0.0.1:8000`
 
 ---
 
-## 5. 系统
+## 6. 系统
 
-### 5.1 健康检查
+### 6.1 健康检查
 
 `GET /health`
 
@@ -564,7 +612,7 @@ Base URL: `http://127.0.0.1:8000`
 }
 ```
 
-### 5.2 根路由
+### 6.2 根路由
 
 `GET /`
 

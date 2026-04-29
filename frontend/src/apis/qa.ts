@@ -1,5 +1,24 @@
 import api from './index'
 
-export function askQuestion(question: string, threadId: string = 'default') {
-  return api.post('/qa', { question, thread_id: threadId })
+interface HistoryItem {
+  role: string
+  content: string
+}
+
+export function askQuestion(
+  question: string,
+  threadId: string = 'default',
+  history: HistoryItem[] = [],
+  summary: string = '',
+) {
+  return api.post('/qa', {
+    question,
+    thread_id: threadId,
+    history,
+    summary,
+  })
+}
+
+export function summarizeMessages(messages: HistoryItem[]) {
+  return api.post('/conversations/summarize', { messages })
 }
