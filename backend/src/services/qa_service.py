@@ -1,6 +1,7 @@
 from langchain_core.messages import HumanMessage
 
 from src.ai.agents.qa_agent import qa_agent
+from src.ai.vectorstores import chroma_store
 
 
 def ask(question: str, thread_id: str = "default") -> dict:
@@ -11,4 +12,9 @@ def ask(question: str, thread_id: str = "default") -> dict:
     )
 
     # 结构化输出已自动解析为 QAResult
-    return response["structured_response"].model_dump()
+    result = response["structured_response"].model_dump()
+
+    # 保存问答记录，用于薄弱知识点分析
+    chroma_store.save_qa_record(question, result)
+
+    return result
