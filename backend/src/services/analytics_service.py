@@ -44,6 +44,10 @@ def list_weak_points() -> list[dict]:
                     "last_active": ts,
                 }
             stat = kp_stats[kp]
+            # 优先保留非空的学科
+            new_subject = record.get("subject", "")
+            if new_subject and not stat["subject"]:
+                stat["subject"] = new_subject
             stat["ask_count"] += 1
             if not record.get("used_note", True):
                 stat["missing_count"] += 1
