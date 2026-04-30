@@ -26,25 +26,33 @@
         </div>
         <div ref="chartRef" class="chart-container"></div>
       </div>
-      <div class="card dashboard__upload">
-        <div class="card__header">
-          <FileUp :size="18" />
-          <span>文档上传</span>
+      <div class="card dashboard__right">
+        <div class="right-sub-card">
+          <el-upload
+            drag
+            :auto-upload="true"
+            :show-file-list="false"
+            accept=".pdf,.docx"
+            :before-upload="beforeUpload"
+            :http-request="handleUpload"
+          >
+            <div class="upload-area">
+              <UploadCloud :size="28" />
+              <p>拖拽或 <em>点击上传</em></p>
+              <span class="upload-area__tip">PDF / DOCX</span>
+            </div>
+          </el-upload>
         </div>
-        <el-upload
-          drag
-          :auto-upload="true"
-          :show-file-list="false"
-          accept=".pdf,.docx"
-          :before-upload="beforeUpload"
-          :http-request="handleUpload"
-        >
-          <div class="upload-area">
-            <UploadCloud :size="36" />
-            <p>拖拽文件到此处，或 <em>点击上传</em></p>
-            <span class="upload-area__tip">支持 PDF、DOCX 格式</span>
+        <div class="right-sub-card right-sub-card--chart">
+          <div class="right-activity__header">
+            <div class="right-activity__left">
+              <TrendingUp :size="14" />
+              <span>活跃度趋势</span>
+            </div>
+            <span class="right-activity__badge">最近7天</span>
           </div>
-        </el-upload>
+          <div ref="activityChartRef" class="activity-chart"></div>
+        </div>
       </div>
     </div>
 
@@ -116,7 +124,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, nextTick } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import * as echarts from 'echarts'
 import {
@@ -135,9 +143,11 @@ const coveragePercent = ref(0)  // 改名但保留，存活跃知识点总数
 const reviewCount = ref(0)
 const reviewSuggestions = ref<any[]>([])
 const chartRef = ref<HTMLElement>()
+const activityChartRef = ref<HTMLElement>()
 const chartMode = ref('daily')
 
 let chartInstance: echarts.ECharts | null = null
+let activityChart: echarts.ECharts | null = null
 
 // 统计卡片
 const stats = computed(() => {
@@ -175,8 +185,10 @@ async function loadData() {
       reviewSuggestions.value = dash.review_suggestions || []
     }
     if (dailyRes.status === 'fulfilled') {
+      const dailyData = dailyRes.value.data || { dates: [], subjects: [], series: {} }
       await nextTick()
-      renderChart(dailyRes.value.data || { dates: [], subjects: [], series: {} })
+      renderChart(dailyData)
+      renderActivityChart(dailyData)
     }
   } catch { /* ignore */ }
 }
@@ -231,6 +243,53 @@ function renderChart(data: { dates: string[]; subjects: string[]; series: Record
       backgroundColor: '#fff',
       borderColor: '#e5e7eb',
       textStyle: { color: '#1e1f1f', fontSize: 12 },
+    },
+  })
+}
+
+function renderActivityChart(data: { dates: string[], subjects: string[], series: Record<string, number[]> }) {
+  if (!activityChartRef.value) return
+  // 取最近 7 天
+  const dates7 = data.dates.slice(-7)
+  // 每天所有学科提问总数
+  const totals7 = dates7.map((_, i) => {
+    const idx = data.dates.length - 7 + i
+    return data.subjects.reduce((sum, s) => sum + (data.series[s]?.[idx] || 0), 0)
+  })
+
+  if (!activityChart) {
+    activityChart = echarts.init(activityChartRef.value)
+  }
+  activityChart.setOption({
+    grid: { top: 8, right: 8, bottom: 20, left: 28 },
+    xAxis: {
+      type: 'category',
+      data: dates7,
+      axisLine: { lineStyle: { color: '#d7d9d9' } },
+      axisLabel: { color: '#979999', fontSize: 10 },
+    },
+    yAxis: {
+      type: 'value',
+      minInterval: 1,
+      axisLine: { show: false },
+      splitLine: { lineStyle: { color: '#eef0f0' } },
+      axisLabel: { color: '#979999', fontSize: 10 },
+    },
+    series: [{
+      type: 'line',
+      data: totals7,
+      smooth: true,
+      symbol: 'circle',
+      symbolSize: 6,
+      lineStyle: { color: '#3996ae', width: 2 },
+      itemStyle: { color: '#3996ae' },
+      areaStyle: { color: 'rgba(57,150,174,0.1)' },
+    }],
+    tooltip: {
+      trigger: 'axis',
+      backgroundColor: '#fff',
+      borderColor: '#e5e7eb',
+      textStyle: { color: '#1e1f1f', fontSize: 11 },
     },
   })
 }
@@ -299,7 +358,21 @@ function levelLabel(level: string) {
   return { high: '高', medium: '中', low: '低' }[level] || level
 }
 
-onMounted(loadData)
+function handleResize() {
+  chartInstance?.resize()
+  activityChart?.resize()
+}
+
+onMounted(() => {
+  loadData()
+  window.addEventListener('resize', handleResize)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', handleResize)
+  chartInstance?.dispose()
+  activityChart?.dispose()
+})
 </script>
 
 <style scoped lang="less">
@@ -394,7 +467,8 @@ onMounted(loadData)
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 12px 0;
+  justify-content: center;
+  padding: 8px 0;
   color: var(--gray-500);
 
   em {
@@ -403,14 +477,81 @@ onMounted(loadData)
   }
 
   p {
-    margin: 6px 0 2px;
-    font-size: 13px;
+    margin: 4px 0 2px;
+    font-size: 12px;
   }
 }
 
 .upload-area__tip {
-  font-size: 12px;
+  font-size: 11px;
   color: var(--gray-400);
+}
+
+/* 右侧大卡片 */
+.dashboard__right {
+  grid-column: span 2;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* 浮动小卡片 */
+.right-sub-card {
+  background: var(--main-0);
+  border-radius: 10px;
+  border: 0.8px solid var(--gray-200);
+  box-shadow: 0 1px 3px var(--shadow-1);
+  padding: 12px;
+  flex: 1;
+
+  :deep(.el-upload) {
+    width: 100%;
+    height: 100%;
+  }
+
+  :deep(.el-upload-dragger) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    padding: 8px;
+    border-radius: 8px;
+  }
+}
+
+.right-sub-card--chart {
+  flex: 2;
+  display: flex;
+  flex-direction: column;
+}
+
+.right-activity__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.right-activity__left {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--main-800);
+}
+
+.right-activity__badge {
+  font-size: 11px;
+  color: var(--gray-500);
+  background: var(--gray-100);
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.activity-chart {
+  flex: 1;
+  min-height: 120px;
 }
 
 /* 折线图 */
@@ -427,23 +568,6 @@ onMounted(loadData)
 
 .dashboard__chart {
   grid-column: span 4;
-}
-
-.dashboard__upload {
-  grid-column: span 2;
-  display: flex;
-  flex-direction: column;
-
-  :deep(.el-upload) {
-    flex: 1;
-  }
-
-  :deep(.el-upload-dragger) {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-  }
 }
 
 /* 文档列表 */
