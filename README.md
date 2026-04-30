@@ -2,8 +2,6 @@
 
 基于上传的学习笔记，通过大模型 API 与 LangChain Chain 实现知识抽取、检索及智能问答，结合 Chroma 向量库自动识别薄弱知识点并推送关联内容，辅助高效学习。
 
----
-
 ## ✨ 核心特性
 
 - **智能问答** — LangChain Chain 驱动，1 次 LLM 调用完成知识检索 + 结构化回答，支持多轮对话记忆与摘要压缩
@@ -12,8 +10,6 @@
 - **知识图谱** — 学科 → 文档 → 知识点三层图谱，共现关联，ECharts 力导向/环形布局
 - **笔记纠错** — 自动指出笔记中的错误并给出正确解释，缺失知识点提醒补充
 - **LaTeX 渲染** — 问答输出支持数学公式 + Markdown 实时渲染
-
----
 
 ## 🚀 快速开始
 
@@ -42,31 +38,28 @@ npm install
 npm run dev
 ```
 
+等待启动完成后，访问 http://localhost:5173
+
 > **首次使用请先上传学习笔记（PDF/DOCX），否则问答和仪表盘无数据。**
 
 后端 API 文档：http://127.0.0.1:8000/docs
-等待启动完成后，访问 http://localhost:5173
-
----
 
 ## 📸 项目截图
 
-<table>
+<table width="100%">
   <tr>
-    <td align="center"><a href="images/仪表盘1.png"><img src="images/仪表盘1.png" width="100%" /></a><br/>仪表盘概览</td>
-    <td align="center"><a href="images/仪表盘2.png"><img src="images/仪表盘2.png" width="100%" /></a><br/>文档列表与薄弱点</td>
+    <td width="50%" align="center"><a href="images/仪表盘1.png"><img src="images/仪表盘1.png" width="100%" /></a><br/>仪表盘概览</td>
+    <td width="50%" align="center"><a href="images/仪表盘2.png"><img src="images/仪表盘2.png" width="100%" /></a><br/>文档列表与薄弱点</td>
   </tr>
   <tr>
-    <td align="center"><a href="images/智能问答1.png"><img src="images/智能问答1.png" width="100%" /></a><br/>LaTeX 公式渲染</td>
-    <td align="center"><a href="images/智能问答2.png"><img src="images/智能问答2.png" width="100%" /></a><br/>多轮对话</td>
+    <td width="50%" align="center"><a href="images/智能问答1.png"><img src="images/智能问答1.png" width="100%" /></a><br/>LaTeX 公式渲染</td>
+    <td width="50%" align="center"><a href="images/智能问答2.png"><img src="images/智能问答2.png" width="100%" /></a><br/>多轮对话</td>
   </tr>
   <tr>
-    <td align="center"><a href="images/知识图谱1.png"><img src="images/知识图谱1.png" width="100%" /></a><br/>力导向布局</td>
-    <td align="center"><a href="images/知识图谱3.png"><img src="images/知识图谱3.png" width="100%" /></a><br/>环形布局</td>
+    <td width="50%" align="center"><a href="images/知识图谱1.png"><img src="images/知识图谱1.png" width="100%" /></a><br/>力导向布局</td>
+    <td width="50%" align="center"><a href="images/知识图谱3.png"><img src="images/知识图谱3.png" width="100%" /></a><br/>环形布局</td>
   </tr>
 </table>
-
----
 
 ## 🛠️ 技术栈
 
@@ -84,8 +77,6 @@ npm run dev
 | Embedding | DashScope Embeddings |
 | 向量数据库 | Chroma（嵌入式） |
 | 文档解析 | PyPDFLoader、Docx2txtLoader |
-
----
 
 ## 📁 项目结构
 
@@ -111,8 +102,6 @@ Chen-Assistant/
         └── assets/css/       # 全局样式 + CSS 变量
 ```
 
----
-
 ## 💝 致谢
 
 本项目参考并引用了以下优秀开源项目，在此致以诚挚的感谢：
@@ -122,8 +111,6 @@ Chen-Assistant/
 [FastAPI](https://github.com/tiangolo/fastapi) — 直接引入作为后端 Web 服务框架
 [ECharts](https://github.com/apache/echarts) — 直接引入作为数据可视化与知识图谱的图表引擎
 [Yuxi](https://github.com/xerrors/Yuxi) — 参考了其项目结构与文档组织方式
-
----
 
 ## 📄 许可证
 
