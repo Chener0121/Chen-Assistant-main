@@ -28,6 +28,12 @@
       </div>
       <div class="card dashboard__right">
         <div class="right-sub-card">
+          <div class="right-activity__header">
+            <div class="right-activity__left">
+              <UploadCloud :size="14" />
+              <span>文档上传</span>
+            </div>
+          </div>
           <el-upload
             drag
             :auto-upload="true"
@@ -218,7 +224,7 @@ function renderChart(data: { dates: string[]; subjects: string[]; series: Record
     itemStyle: { color: CHART_COLORS[i % CHART_COLORS.length], borderRadius: [2, 2, 0, 0] },
   }))
   chartInstance.setOption({
-    grid: { top: 20, right: 20, bottom: 50, left: 40 },
+    grid: { top: 20, right: 20, bottom: 50, left: 40, containLabel: true },
     legend: {
       bottom: 0,
       left: 'center',
@@ -261,7 +267,7 @@ function renderActivityChart(data: { dates: string[], subjects: string[], series
     activityChart = echarts.init(activityChartRef.value)
   }
   activityChart.setOption({
-    grid: { top: 8, right: 8, bottom: 20, left: 28 },
+    grid: { top: 16, right: 12, bottom: 4, left: 28, containLabel: true },
     xAxis: {
       type: 'category',
       data: dates7,
@@ -279,11 +285,20 @@ function renderActivityChart(data: { dates: string[], subjects: string[], series
       type: 'line',
       data: totals7,
       smooth: true,
-      symbol: 'circle',
+      symbol: 'emptyCircle',
       symbolSize: 6,
-      lineStyle: { color: '#3996ae', width: 2 },
-      itemStyle: { color: '#3996ae' },
-      areaStyle: { color: 'rgba(57,150,174,0.1)' },
+      lineStyle: { color: '#035065', width: 2 },
+      itemStyle: { color: '#035065', borderColor: '#035065' },
+      areaStyle: {
+        color: {
+          type: 'linear',
+          x: 0, y: 0, x2: 0, y2: 1,
+          colorStops: [
+            { offset: 0, color: 'rgba(3,80,101,1.05)' },
+            { offset: 1, color: 'rgba(3,80,101,0.02)' },
+          ],
+        },
+      },
     }],
     tooltip: {
       trigger: 'axis',
@@ -556,7 +571,7 @@ onBeforeUnmount(() => {
 
 /* 折线图 */
 .chart-container {
-  height: 240px;
+  height: 280px;
 }
 
 /* 趋势 + 上传同行 */
@@ -564,10 +579,18 @@ onBeforeUnmount(() => {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
   gap: 16px;
+  min-height: 400px;
 }
 
 .dashboard__chart {
   grid-column: span 4;
+  display: flex;
+  flex-direction: column;
+}
+
+.chart-container {
+  flex: 1;
+  min-height: 240px;
 }
 
 /* 文档列表 */
