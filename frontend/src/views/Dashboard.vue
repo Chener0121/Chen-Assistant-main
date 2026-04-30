@@ -157,7 +157,7 @@ async function switchChart(mode: string) {
   } catch { /* ignore */ }
 }
 
-const CHART_COLORS = ['#3996ae', '#5AD8A6', '#F6BD16', '#F27C7C', '#9581CC', '#6DC8EC']
+const CHART_COLORS = ['#3996ae', '#5AD8A6', '#F6BD16', '#F27C7C', '#9581CC', '#6DC8EC', '#FF9D4D', '#92D050', '#E885BA', '#8C8C8C']
 
 function renderChart(data: { dates: string[]; subjects: string[]; series: Record<string, number[]> }) {
   if (!chartRef.value) return

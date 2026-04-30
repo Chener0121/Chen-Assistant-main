@@ -24,13 +24,13 @@ src/
 │   ├── document.ts            # 文档 CRUD
 │   ├── analytics.ts           # 学习分析（薄弱知识点、每日统计）
 │   ├── graph.ts               # 知识图谱
-│   └── qa.ts                  # 智能问答
+│   └── qa.ts                  # 智能问答 + 对话摘要压缩
 ├── stores/
-│   └── chat.ts                # 会话状态管理（Pinia + localStorage）
+│   └── chat.ts                # 会话状态管理（Pinia + localStorage + 摘要压缩）
 ├── views/
 │   ├── Dashboard.vue          # 数据面板（统计卡片 + 柱状图 + 文档管理 + 薄弱知识点）
-│   ├── ChatPage.vue           # 智能问答（会话列表 + 消息气泡 + LaTeX/Markdown 渲染）
-│   └── GraphPage.vue          # 知识图谱（开发中）
+│   ├── ChatPage.vue           # 智能问答（会话列表 + 多轮记忆 + LaTeX/Markdown）
+│   └── GraphPage.vue          # 知识图谱（ECharts 力导向/环形布局 + 学科配色 + 关联高亮）
 ├── components/
 │   └── layout/                # 布局组件
 │       ├── Layout.vue         # 整体骨架（Sidebar + Header + Content）
