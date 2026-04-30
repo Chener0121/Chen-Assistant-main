@@ -7,3 +7,7 @@ export function fetchWeakPoints() {
 export function fetchDailyStats(mode: string = 'daily') {
   return api.get('/analytics/daily-stats', { params: { mode } })
 }
+
+export function fetchDashboardStats() {
+  return api.get('/analytics/dashboard-stats')
+}

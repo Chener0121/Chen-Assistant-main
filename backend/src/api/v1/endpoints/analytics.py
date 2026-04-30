@@ -25,3 +25,15 @@ async def get_daily_stats(mode: str = "daily") -> Response:
     """mode=daily 近14天，mode=hourly 近14小时"""
     stats = analytics_service.daily_stats(mode)
     return Response(data=stats)
+
+
+@router.get("/dashboard-stats", summary="仪表盘统计")
+async def get_dashboard_stats() -> Response:
+    """返回学科覆盖率和复习建议"""
+    coverage = analytics_service.coverage_stats()
+    suggestions = analytics_service.review_suggestions()
+    return Response(data={
+        "coverage": coverage,
+        "review_count": len(suggestions),
+        "review_suggestions": suggestions[:5],
+    })

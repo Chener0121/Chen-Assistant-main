@@ -92,6 +92,26 @@
         </div>
       </div>
     </div>
+
+    <!-- 复习建议 -->
+    <div v-if="reviewSuggestions.length" class="card">
+      <div class="card__header">
+        <RefreshCw :size="18" />
+        <span>复习建议</span>
+      </div>
+      <div class="review-list">
+        <div v-for="item in reviewSuggestions" :key="item.knowledge_point" class="review-item">
+          <div class="review-item__info">
+            <span class="review-item__name">{{ item.knowledge_point }}</span>
+            <el-tag size="small" :type="levelTagType(item.level)">{{ levelLabel(item.level) }}</el-tag>
+          </div>
+          <div class="review-item__meta">
+            <span>{{ item.subject }}</span>
+            <span>{{ item.days_inactive }} 天未复习</span>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -102,14 +122,18 @@ import * as echarts from 'echarts'
 import {
   FileText, FileUp, FolderOpen, UploadCloud, Trash2,
   AlertTriangle, BookOpen, Lightbulb, ShieldAlert, TrendingUp,
+  Target, RefreshCw,
 } from 'lucide-vue-next'
 import { fetchDocuments, uploadDocument, deleteDocument } from '@/apis/document'
-import { fetchWeakPoints, fetchDailyStats } from '@/apis/analytics'
+import { fetchWeakPoints, fetchDailyStats, fetchDashboardStats } from '@/apis/analytics'
 import { fetchGraph } from '@/apis/graph'
 
 const documents = ref<any[]>([])
 const weakPoints = ref<any[]>([])
 const kpCount = ref(0)
+const coveragePercent = ref(0)  // 改名但保留，存活跃知识点总数
+const reviewCount = ref(0)
+const reviewSuggestions = ref<any[]>([])
 const chartRef = ref<HTMLElement>()
 const chartMode = ref('daily')
 
@@ -122,24 +146,33 @@ const stats = computed(() => {
     { label: '文档总数', value: documents.value.length, icon: FolderOpen, color: 'var(--color-primary-500)', bg: 'var(--color-primary-50)' },
     { label: '学科数量', value: subjects.size, icon: BookOpen, color: 'var(--color-accent-700)', bg: 'var(--color-accent-50)' },
     { label: '知识点数', value: kpCount.value, icon: Lightbulb, color: 'var(--color-warning-700)', bg: 'var(--color-warning-50)' },
+    { label: '活跃知识点', value: coveragePercent.value, icon: Target, color: '#6DC8EC', bg: '#E8F6FD' },
     { label: '薄弱知识点', value: weakPoints.value.length, icon: ShieldAlert, color: 'var(--color-error-500)', bg: 'var(--color-error-50)' },
+    { label: '待复习', value: reviewCount.value, icon: RefreshCw, color: '#9581CC', bg: '#F0EDF8' },
   ]
 })
 
 // 加载数据
 async function loadData() {
   try {
-    const [docRes, wpRes, graphRes, dailyRes] = await Promise.allSettled([
+    const [docRes, wpRes, graphRes, dailyRes, dashRes] = await Promise.allSettled([
       fetchDocuments(),
       fetchWeakPoints(),
       fetchGraph(),
       fetchDailyStats(chartMode.value),
+      fetchDashboardStats(),
     ])
     if (docRes.status === 'fulfilled') documents.value = docRes.value.data || []
     if (wpRes.status === 'fulfilled') weakPoints.value = wpRes.value.data || []
     if (graphRes.status === 'fulfilled') {
       const nodes = graphRes.value.data?.nodes || []
       kpCount.value = nodes.filter((n: any) => n.type === 'knowledge_point').length
+    }
+    if (dashRes.status === 'fulfilled') {
+      const dash = dashRes.value.data || {}
+      coveragePercent.value = dash.coverage?.total_active_kps || 0
+      reviewCount.value = dash.review_count || 0
+      reviewSuggestions.value = dash.review_suggestions || []
     }
     if (dailyRes.status === 'fulfilled') {
       await nextTick()
@@ -323,7 +356,7 @@ onMounted(loadData)
 /* 统计卡片 */
 .dashboard__stats {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(6, 1fr);
   gap: 16px;
 }
 
@@ -491,5 +524,39 @@ onMounted(loadData)
   padding: 24px 0;
   color: var(--gray-400);
   font-size: 13px;
+}
+
+/* 复习建议 */
+.review-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.review-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: var(--gray-50);
+}
+
+.review-item__info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.review-item__name {
+  font-size: 14px;
+  color: var(--main-800);
+}
+
+.review-item__meta {
+  display: flex;
+  gap: 16px;
+  font-size: 12px;
+  color: var(--gray-500);
 }
 </style>

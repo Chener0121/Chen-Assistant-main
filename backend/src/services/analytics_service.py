@@ -129,3 +129,56 @@ def daily_stats(mode: str = "daily") -> dict:
     # 缩短标签显示
     labels = [s[5:] if mode == "daily" else s[11:] for s in slots]
     return {"dates": labels, "subjects": subjects, "series": series}
+
+
+def coverage_stats() -> dict:
+    """知识活跃度：各学科被提问过的唯一知识点数量"""
+    qa = chroma_store.get_qa_store()
+
+    # 各学科被提问过的唯一知识点数
+    qa_records = qa.get(include=["metadatas"])
+    subject_kps: dict[str, set[str]] = {}
+    for meta in qa_records["metadatas"] or []:
+        subject = meta.get("subject", "")
+        points = meta.get("knowledge_points", "")
+        if subject and points:
+            subject_kps.setdefault(subject, set()).update(
+                p.strip() for p in points.split(",") if p.strip()
+            )
+
+    total_kps = sum(len(kps) for kps in subject_kps.values())
+
+    return {
+        "total_active_kps": total_kps,
+        "subjects": {
+            s: len(subject_kps.get(s, set()))
+            for s in sorted(subject_kps.keys())
+        },
+    }
+
+
+def review_suggestions() -> list[dict]:
+    """返回建议复习的知识点：薄弱 + 超过 3 天未提问"""
+    weak_points = list_weak_points()
+    if not weak_points:
+        return []
+
+    now = datetime.now()
+    suggestions = []
+    for wp in weak_points:
+        last_active_str = wp.get("last_active", "")
+        try:
+            last_active = datetime.fromisoformat(last_active_str)
+            days_inactive = (now - last_active).days
+        except (ValueError, TypeError):
+            days_inactive = 999
+
+        if days_inactive >= 3:
+            suggestions.append({
+                "knowledge_point": wp["knowledge_point"],
+                "subject": wp["subject"],
+                "level": wp["level"],
+                "days_inactive": days_inactive,
+            })
+
+    return suggestions
