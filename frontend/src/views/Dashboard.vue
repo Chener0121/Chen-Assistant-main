@@ -134,7 +134,7 @@ import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import * as echarts from 'echarts'
 import {
-  FileText, FileUp, FolderOpen, UploadCloud, Trash2,
+  FileText, FolderOpen, UploadCloud, Trash2,
   AlertTriangle, BookOpen, Lightbulb, ShieldAlert, TrendingUp,
   Target, RefreshCw,
 } from 'lucide-vue-next'
