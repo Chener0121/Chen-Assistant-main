@@ -1,63 +1,74 @@
-# 🎓 知识图谱智学助手(Chen-Assistant)
+# 知识图谱智学助手 (Chen-Assistant)
 
 基于上传的学习笔记，通过大模型 API 与 LangChain Chain 实现知识抽取、检索及智能问答，结合 Chroma 向量库自动识别薄弱知识点并推送关联内容，辅助高效学习。
 
-*Here is a dream.*
+---
+
+## ✨ 核心特性
+
+- **智能问答** — LangChain Chain 驱动，1 次 LLM 调用完成知识检索 + 结构化回答，支持多轮对话记忆与摘要压缩
+- **文档管理** — PDF/DOCX 上传解析，中文标点智能切片，Chunk 级增量去重，自动学科识别
+- **学习分析** — 薄弱知识点自动识别（时间衰减），活跃度趋势统计，复习建议推送
+- **知识图谱** — 学科 → 文档 → 知识点三层图谱，共现关联，ECharts 力导向/环形布局
+- **笔记纠错** — 自动指出笔记中的错误并给出正确解释，缺失知识点提醒补充
+- **LaTeX 渲染** — 问答输出支持数学公式 + Markdown 实时渲染
 
 ---
 
-## ✨ 已完成功能
+## 🚀 快速开始
 
-### 📄 文档管理
-- PDF / DOCX 上传与解析（PyPDFLoader、Docx2txtLoader）
-- 中文标点优先的智能切片（RecursiveCharacterTextSplitter）
-- Chunk 级增量去重（MD5 hash），只 embedding 变化部分
-- 自动学科识别（LLM 从固定列表中匹配，防止多余输出）
-- 文档列表查询（含 chunk 数量）、详情查看、删除
+克隆代码，并初始化
 
-### 🤖 智能问答
-- LangChain Chain 驱动（prompt | llm.with_structured_output，1 次 LLM 调用）
-- 代码自动判断意图：笔记检索 / 薄弱点查询，无需 Agent 决策
-- 学科过滤检索，避免跨学科内容干扰
-- 笔记纠错：自动指出笔记中的错误并给出正确解释
-- 笔记缺失提醒：笔记中没有的知识点会提示补充
-- 多轮对话记忆：前端传历史消息 + 摘要压缩（超过 20 条自动压缩），thread_id 会话隔离
-- 闲聊支持：非学习问题正常回答，不污染学习数据
-- LaTeX 公式 + Markdown 渲染
+```bash
+git clone https://github.com/Chener0121/Chen-Assistant-main.git
+cd Chen-Assistant
+```
 
-### 📊 学习分析
-- 薄弱知识点自动识别（高频提问 + 笔记缺失 + 笔记纠错）
-- 时间衰减机制（30/60 天分级降级）
-- 对话中可查询薄弱项（代码关键词匹配 → 直接查数据）
-- 近 14 天 / 14 小时提问趋势统计（按学科分组堆叠柱状图）
+启动后端服务
 
-### 🕸️ 知识图谱
-- 自动构建学科 → 文档 → 知识点三层图谱
-- 知识点共现关联（同一问题中出现的知识点自动连边）
-- ECharts 力导向/环形布局切换，学科配色，点击关联高亮
+```bash
+# Windows PowerShell
+cd backend
+uv sync
+uv run python main.py
+```
 
-### 🎨 前端界面
-- Layout 骨架（64px 侧边栏 + 顶部栏 + 可滚动内容区）
-- 数据面板：统计卡片 + 提问趋势图 + 文档上传/列表 + 薄弱知识点
-- 智能问答：左侧会话列表（新建/切换/删除）+ 右侧消息气泡 + LaTeX 渲染
-- 会话持久化（Pinia + localStorage）
+启动前端服务
 
+```bash
+# Windows PowerShell
+cd frontend
+npm install
+npm run dev
+```
+
+> **首次使用请先上传学习笔记（PDF/DOCX），否则问答和仪表盘无数据。**
+
+后端 API 文档：http://127.0.0.1:8000/docs
+等待启动完成后，访问 http://localhost:5173
 
 ---
 
 ## 📸 项目截图
 
-**仪表盘**
-
-![仪表盘](images/仪表盘.png)
-
-**智能问答**
-
-![智能问答](images/智能问答.png)
+<table>
+  <tr>
+    <td align="center"><a href="images/仪表盘1.png"><img src="images/仪表盘1.png" width="100%" /></a><br/>仪表盘概览</td>
+    <td align="center"><a href="images/仪表盘2.png"><img src="images/仪表盘2.png" width="100%" /></a><br/>文档列表与薄弱点</td>
+  </tr>
+  <tr>
+    <td align="center"><a href="images/智能问答1.png"><img src="images/智能问答1.png" width="100%" /></a><br/>LaTeX 公式渲染</td>
+    <td align="center"><a href="images/智能问答2.png"><img src="images/智能问答2.png" width="100%" /></a><br/>多轮对话</td>
+  </tr>
+  <tr>
+    <td align="center"><a href="images/知识图谱1.png"><img src="images/知识图谱1.png" width="100%" /></a><br/>力导向布局</td>
+    <td align="center"><a href="images/知识图谱3.png"><img src="images/知识图谱3.png" width="100%" /></a><br/>环形布局</td>
+  </tr>
+</table>
 
 ---
 
-## 🛠 技术栈
+## 🛠️ 技术栈
 
 | 层级 | 技术 |
 |------|------|
@@ -73,27 +84,6 @@
 | Embedding | DashScope Embeddings |
 | 向量数据库 | Chroma（嵌入式） |
 | 文档解析 | PyPDFLoader、Docx2txtLoader |
-
----
-
-## 🚀 快速开始
-
-```bash
-# 后端
-cd backend
-uv sync
-.venv\Scripts\activate + python main.py 或 uv run python main.py
-
-# 前端
-cd frontend
-npm install
-npm run dev
-```
-
-> **首次使用请先上传学习笔记（PDF/DOCX），否则问答和仪表盘无数据。**
-
-后端 API 文档：http://127.0.0.1:8000/docs
-前端开发地址：http://localhost:5173
 
 ---
 
@@ -123,6 +113,22 @@ Chen-Assistant/
 
 ---
 
-## 🗺️ 下一阶段
+## 💝 致谢
 
-- 🌊 前端流式输出（SSE + token-by-token 渲染）
+本项目参考并引用了以下优秀开源项目，在此致以诚挚的感谢：
+
+[LangChain](https://github.com/langchain-ai/langchain) — 直接引入作为 LLM 应用开发与 Chain 编排的基础框架
+[Chroma](https://github.com/chroma-core/chroma) — 直接引入作为向量存储与相似度检索的基础包
+[FastAPI](https://github.com/tiangolo/fastapi) — 直接引入作为后端 Web 服务框架
+[ECharts](https://github.com/apache/echarts) — 直接引入作为数据可视化与知识图谱的图表引擎
+[Yuxi](https://github.com/xerrors/Yuxi) — 参考了其项目结构与文档组织方式
+
+---
+
+## 📄 许可证
+
+本项目采用 MIT 许可证 - 查看 [MIT License](LICENSE) 文件了解详情。
+
+---
+
+如果这个项目对您有帮助，请不要忘记给我们一个 ⭐️

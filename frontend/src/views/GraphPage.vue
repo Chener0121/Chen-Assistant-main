@@ -6,6 +6,7 @@
       <p>暂无图谱数据，上传笔记并提问后自动生成</p>
     </div>
     <template v-else>
+      <div class="graph-title">知识图谱</div>
       <div class="graph-toolbar">
         <button
           :class="['graph-toolbar__btn', { active: layoutMode === 'force' }]"
@@ -318,6 +319,16 @@ onBeforeUnmount(() => {
   p {
     font-size: 14px;
   }
+}
+
+.graph-title {
+  position: absolute;
+  top: 16px;
+  left: 20px;
+  z-index: 10;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--main-800);
 }
 
 .graph-toolbar {
