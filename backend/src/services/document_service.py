@@ -1,6 +1,10 @@
 import hashlib
+import logging
 import tempfile
+import time
 from pathlib import Path
+
+logger = logging.getLogger(__name__)
 
 from langchain_community.document_loaders import PyPDFLoader, Docx2txtLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
@@ -51,6 +55,8 @@ def _detect_subject(text: str) -> str:
 
 def process_upload(file_bytes: bytes, filename: str) -> dict:
     """文件上传主流程：解析 → 切片 → chunk 级增量 diff → 入库"""
+    t0 = time.perf_counter()
+
     # 校验文件类型
     ext = Path(filename).suffix.lower()
     if ext not in LOADERS:
@@ -70,12 +76,16 @@ def process_upload(file_bytes: bytes, filename: str) -> dict:
     finally:
         Path(tmp_path).unlink(missing_ok=True)
 
+    t_parse = time.perf_counter()
+
     # 切片，过滤掉空文本 chunk（避免 embedding API 报错）
     chunks = [c for c in _splitter.split_documents(docs) if c.page_content.strip()]
 
     # 用 LLM 判断学科（取所有 chunk 拼接后的前 800 字）
     full_text = "\n".join(c.page_content for c in chunks)
     subject = _detect_subject(full_text)
+
+    t_detect = time.perf_counter()
 
     # 为每个 chunk 计算 chunk_hash，注入 metadata
     for chunk in chunks:
@@ -111,6 +121,16 @@ def process_upload(file_bytes: bytes, filename: str) -> dict:
     # 新增 chunks 入库
     if new_chunks:
         chroma_store.add_chunks(new_chunks, new_ids)
+
+    t_total = time.perf_counter()
+    total = t_total - t0
+    print(
+        f"\n===== 文档处理耗时: {total:.2f}s =====\n"
+        f"  解析: {t_parse - t0:.2f}s\n"
+        f"  学科识别: {t_detect - t_parse:.2f}s\n"
+        f"  入库: {t_total - t_detect:.2f}s\n"
+        f"  文件: {filename}, 新增: {len(new_chunks)}, 跳过: {skipped_count}\n"
+    )
 
     return {
         "file_id": file_id,
