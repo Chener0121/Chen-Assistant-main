@@ -151,6 +151,9 @@ function buildOption(data: { nodes: any[], edges: any[] }, layout: 'force' | 'ci
   const seriesConfig: any = {
     type: 'graph',
     animation: true,
+    animationDuration: 300,
+    animationDurationUpdate: 300,
+    animationEasingUpdate: 'cubicInOut',
     draggable: true,
     roam: true,
     zoom: 1,
@@ -158,6 +161,12 @@ function buildOption(data: { nodes: any[], edges: any[] }, layout: 'force' | 'ci
       focus: 'adjacency',
       lineStyle: { width: 3 },
       label: { show: true, fontSize: 12 },
+      blurScope: 'global',
+      itemStyle: { shadowBlur: 10, shadowColor: 'rgba(0,0,0,0.15)' },
+    },
+    blur: {
+      itemStyle: { opacity: 0.2 },
+      lineStyle: { opacity: 0.1 },
     },
     categories: subjectList.map(s => ({
       name: s,
