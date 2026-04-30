@@ -48,16 +48,16 @@ npm run dev
 
 <table width="100%">
   <tr>
-    <td width="50%" align="center"><a href="https://github.com/Chener0121/Chen-Assistant-main/blob/master/images/仪表盘1.png"><img src="images/仪表盘1.png" width="100%" /></a><br/>仪表盘概览</td>
-    <td width="50%" align="center"><a href="https://github.com/Chener0121/Chen-Assistant-main/blob/master/images/仪表盘2.png"><img src="images/仪表盘2.png" width="100%" /></a><br/>文档列表与薄弱点</td>
+    <td width="50%" align="center"><a href="images/仪表盘1.png"><img src="images/仪表盘1.png" width="100%" /></a><br/>仪表盘概览</td>
+    <td width="50%" align="center"><a href="images/仪表盘2.png"><img src="images/仪表盘2.png" width="100%" /></a><br/>文档列表与薄弱点</td>
   </tr>
   <tr>
-    <td width="50%" align="center"><a href="https://github.com/Chener0121/Chen-Assistant-main/blob/master/images/智能问答1.png"><img src="images/智能问答1.png" width="100%" /></a><br/>LaTeX 公式渲染</td>
-    <td width="50%" align="center"><a href="https://github.com/Chener0121/Chen-Assistant-main/blob/master/images/智能问答2.png"><img src="images/智能问答2.png" width="100%" /></a><br/>多轮对话</td>
+    <td width="50%" align="center"><a href="images/智能问答1.png"><img src="images/智能问答1.png" width="100%" /></a><br/>LaTeX 公式渲染</td>
+    <td width="50%" align="center"><a href="images/智能问答2.png"><img src="images/智能问答2.png" width="100%" /></a><br/>多轮对话</td>
   </tr>
   <tr>
-    <td width="50%" align="center"><a href="https://github.com/Chener0121/Chen-Assistant-main/blob/master/images/知识图谱1.png"><img src="images/知识图谱1.png" width="100%" /></a><br/>力导向布局</td>
-    <td width="50%" align="center"><a href="https://github.com/Chener0121/Chen-Assistant-main/blob/master/images/知识图谱3.png"><img src="images/知识图谱3.png" width="100%" /></a><br/>环形布局</td>
+    <td width="50%" align="center"><a href="images/知识图谱1.png"><img src="images/知识图谱1.png" width="100%" /></a><br/>力导向布局</td>
+    <td width="50%" align="center"><a href="images/知识图谱3.png"><img src="images/知识图谱3.png" width="100%" /></a><br/>环形布局</td>
   </tr>
 </table>
 
@@ -107,13 +107,9 @@ Chen-Assistant/
 本项目参考并引用了以下优秀开源项目，在此致以诚挚的感谢：
 
 - [LangChain](https://github.com/langchain-ai/langchain) — 直接引入作为 LLM 应用开发与 Chain 编排的基础框架
-
 - [Chroma](https://github.com/chroma-core/chroma) — 直接引入作为向量存储与相似度检索的基础包
-
 - [FastAPI](https://github.com/tiangolo/fastapi) — 直接引入作为后端 Web 服务框架
-
 - [ECharts](https://github.com/apache/echarts) — 直接引入作为数据可视化与知识图谱的图表引擎
-
 - [Yuxi](https://github.com/xerrors/Yuxi) — 参考了其项目结构与文档组织方式
 
 ## 📄 许可证
