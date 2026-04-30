@@ -118,4 +118,4 @@ Chen-Assistant/
 
 ---
 
-<p align="center">如果这个项目对您有帮助，请不要忘记给我们一个 ⭐️</p>
+<p align="center">如果这个项目对您有帮助，请不要忘记给一个 ⭐️</p>
