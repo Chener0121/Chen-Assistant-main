@@ -9,5 +9,5 @@ export function fetchDailyStats(mode: string = 'daily') {
 }
 
 export function fetchDashboardStats() {
-  return api.get('/analytics/dashboard-stats')
+  return api.get('/analytics/summary')
 }

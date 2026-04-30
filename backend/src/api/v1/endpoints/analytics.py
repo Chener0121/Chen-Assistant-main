@@ -27,8 +27,8 @@ async def get_daily_stats(mode: str = "daily") -> Response:
     return Response(data=stats)
 
 
-@router.get("/dashboard-stats", summary="仪表盘统计")
-async def get_dashboard_stats() -> Response:
+@router.get("/summary", summary="仪表盘统计")
+async def get_summary() -> Response:
     """返回学科覆盖率和复习建议"""
     coverage = analytics_service.coverage_stats()
     suggestions = analytics_service.review_suggestions()

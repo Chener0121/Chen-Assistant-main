@@ -310,7 +310,7 @@ Base URL: `http://127.0.0.1:8000`
 
 ### 3.1 对话摘要压缩
 
-`POST /api/v1/conversations/summarize`
+`POST /api/v1/conversations/summary`
 
 将旧对话消息压缩为摘要，减少多轮对话的 token 开销。由前端在消息超过 20 条时自动调用。
 
@@ -580,7 +580,63 @@ Base URL: `http://127.0.0.1:8000`
 
 ---
 
-### 5.3 清空问答记录
+### 5.3 仪表盘统计
+
+`GET /api/v1/analytics/summary`
+
+返回知识活跃度和复习建议，供仪表盘卡片使用。
+
+**请求**：无参数
+
+**响应**
+
+```json
+{
+  "code": 200,
+  "msg": "success",
+  "data": {
+    "coverage": {
+      "total_active_kps": 45,
+      "subjects": {
+        "数学": 28,
+        "英语": 12,
+        "语文": 5
+      }
+    },
+    "review_count": 3,
+    "review_suggestions": [
+      {
+        "knowledge_point": "微分中值定理",
+        "subject": "数学",
+        "level": "high",
+        "days_inactive": 5
+      }
+    ]
+  }
+}
+```
+
+**data 字段说明**
+
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| coverage.total_active_kps | int | 所有学科被提问过的唯一知识点总数 |
+| coverage.subjects | object | 各学科的活跃知识点数，key 为学科名 |
+| review_count | int | 需要复习的知识点总数 |
+| review_suggestions | array | 建议复习的知识点列表（最多 5 条） |
+
+**review_suggestions 字段说明**
+
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| knowledge_point | string | 知识点名称 |
+| subject | string | 所属学科 |
+| level | string | 薄弱等级：`high` / `medium` / `low` |
+| days_inactive | int | 距上次提问天数（≥ 3） |
+
+---
+
+### 5.4 清空问答记录
 
 `DELETE /api/v1/analytics/qa-records`
 

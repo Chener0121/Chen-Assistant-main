@@ -20,5 +20,5 @@ export function askQuestion(
 }
 
 export function summarizeMessages(messages: HistoryItem[]) {
-  return api.post('/conversations/summarize', { messages })
+  return api.post('/conversations/summary', { messages })
 }
