@@ -420,16 +420,17 @@ onMounted(loadData)
 
 /* 趋势 + 上传同行 */
 .dashboard__row {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
   gap: 16px;
 }
 
 .dashboard__chart {
-  flex: 6;
+  grid-column: span 4;
 }
 
 .dashboard__upload {
-  flex: 4;
+  grid-column: span 2;
   display: flex;
   flex-direction: column;
 
